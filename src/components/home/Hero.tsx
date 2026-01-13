@@ -51,7 +51,7 @@ export function Hero() {
                         transition={{ duration: 1, delay: 0.5 }}
                         className="space-y-8"
                     >
-                        <h1 className="mx-auto max-w-5xl text-5xl font-bold leading-tight tracking-tight md:text-7xl lg:text-8xl drop-shadow-lg">
+                        <h1 className="mx-auto max-w-5xl text-5xl font-bold leading-[0.9] tracking-tight md:text-7xl lg:text-8xl drop-shadow-lg">
                             Atuar no mundo hoje cooperando para regeneração
                         </h1>
 

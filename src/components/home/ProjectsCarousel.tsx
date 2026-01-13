@@ -33,7 +33,7 @@ export function ProjectsCarousel() {
 
     return (
         <div className="w-full py-20">
-            <div className="mb-12 flex items-center justify-between px-4 md:px-8 container mx-auto">
+            <div className="mb-20 flex items-center justify-between px-4 md:px-8 container mx-auto">
                 <motion.h2
                     initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -48,22 +48,24 @@ export function ProjectsCarousel() {
                 </div>
             </div>
 
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="overflow-hidden p-4 -m-4"
-                ref={emblaRef}
-            >
-                <div className="flex -ml-4">
-                    {projects.map((project) => (
-                        <div key={project.id} className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] pl-4">
-                            <ProjectCard project={project} />
-                        </div>
-                    ))}
-                </div>
-            </motion.div>
+            <div className="container mx-auto px-4 md:px-8">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                    className="overflow-hidden p-4 -m-4"
+                    ref={emblaRef}
+                >
+                    <div className="flex -ml-4">
+                        {projects.map((project) => (
+                            <div key={project.id} className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] pl-4">
+                                <ProjectCard project={project} />
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            </div>
         </div>
     )
 }
