@@ -1,65 +1,71 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { Hero } from "@/components/home/Hero";
+import { ProjectsCarousel } from "@/components/home/ProjectsCarousel";
+import { Manifesto } from "@/components/home/Manifesto";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import * as motion from "framer-motion/client";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen flex flex-col font-sans">
+      <Header />
+
+      <main className="flex-1 flex flex-col pt-0">
+        {/* 1. Hero Section */}
+        <Hero />
+
+        {/* 2. Introduction: Missão e Bem Viver */}
+        <section className="container mx-auto px-4 md:px-8 py-20 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="max-w-4xl mx-auto space-y-8"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            <span className="inline-block rounded-full bg-[#faefe0] px-4 py-1.5 text-sm font-bold tracking-wider text-[#941c1d] uppercase">
+              Desde 2009
+            </span>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+              Uma OSCIP dedicada à regeneração socioambiental e ao fortalecimento cultural
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600 leading-relaxed text-justify md:text-center">
+              O Instituto Yary é uma associação sem fins lucrativos (OSCIP) que atua há mais de 15 anos em conjunto com populações tradicionais e na área socioambiental.
+              Através do paradigma do <strong className="text-[#941c1d]">Bem Viver</strong>, buscamos construir caminhos para a regeneração ambiental e o fortalecimento cultural e político das comunidades.
+            </p>
+
+            <div className="pt-4">
+              <Link href="/sobre">
+                <Button variant="outline" size="lg" className="rounded-full border-gray-300 px-8 text-gray-700 hover:bg-gray-50 hover:text-black">
+                  Conheça Nossa História
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* 3. Carrossel de Projetos (Featured) */}
+        <section className="bg-gray-50 border-y border-gray-100">
+          <ProjectsCarousel />
+          <div className="container mx-auto px-4 md:px-8 pb-12 text-center">
+            <Link href="/projetos">
+              <Button size="lg" className="rounded-full bg-[#941c1d] px-8 py-6 text-lg font-bold hover:bg-[#7a1617] shadow-lg shadow-[#941c1d]/20 transition-all hover:scale-105">
+                Explorar Todos os Projetos
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+          </div>
+        </section>
+
+        {/* 4. Manifesto (Values) */}
+        <Manifesto />
+
       </main>
+
+      <Footer />
     </div>
   );
 }
