@@ -7,6 +7,7 @@ import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { ArrowLeft, Globe, Instagram, Facebook, Music, Video, Link as LinkIcon } from 'lucide-react'
+import { ShareProject } from '@/components/projects/ShareProject'
 
 export const revalidate = 60
 
@@ -49,13 +50,17 @@ export default async function ProjetoPage({ params }: Props) {
         }
     }
 
+    // Determine current domain for share URL (fallback to localhost if undefined, but ideally env var)
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://institutoyary.org'
+    const shareUrl = `${baseUrl}/projetos/${slug}`
+
     return (
         <div className="min-h-screen flex flex-col font-sans bg-white">
             <Header />
 
             <main className="flex-1">
                 {/* Hero Rendering */}
-                <div className="relative h-[85vh] min-h-[600px] w-full bg-gray-900 flex items-center justify-center">
+                <div className="relative h-[90vh] min-h-[700px] w-full bg-gray-900 flex flex-col">
                     {project.cover_image && (
                         <div className="absolute inset-0 opacity-60">
                             <Image
@@ -69,48 +74,62 @@ export default async function ProjetoPage({ params }: Props) {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-                    <div className="relative z-10 container mx-auto px-4 text-center max-w-4xl space-y-3">
+                    {/* Top Actions Bar */}
+                    <div className="relative z-20 container mx-auto px-4 pt-32 pb-8 md:pt-40 flex items-center justify-between">
                         <Link
                             href="/projetos"
-                            className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-4 hover:-translate-x-1 duration-300"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/90 hover:text-white hover:bg-white/20 transition-all border border-white/20 hover:border-white/40 group text-sm"
                         >
-                            <ArrowLeft className="w-5 h-5 mr-2" />
-                            Todos os Projetos
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                            <span>Todos os Projetos</span>
                         </Link>
-                        <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight">
+
+                        <ShareProject
+                            title={project.title}
+                            description={project.description || ''}
+                            url={shareUrl}
+                            coverImage={project.cover_image || ''}
+                        />
+                    </div>
+
+                    {/* Hero Content */}
+                    <div className="relative z-10 container mx-auto px-4 flex-1 flex flex-col items-center justify-center text-center max-w-5xl -mt-20">
+                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6 md:mb-8 drop-shadow-lg">
                             {project.title}
                         </h1>
                         {project.description && (
-                            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto font-light leading-normal">
+                            <p className="text-lg md:text-xl lg:text-2xl text-gray-100 max-w-3xl mx-auto font-light leading-relaxed drop-shadow">
                                 {project.description}
                             </p>
                         )}
-
-                        {/* Project Links Section */}
-                        {project.links && Array.isArray(project.links) && project.links.length > 0 && (
-                            <div className="pt-8 animate-fade-in-up">
-                                <h3 className="text-white/80 text-sm font-medium uppercase tracking-wider mb-4 border-b border-white/20 inline-block pb-1">
-                                    Links do Projeto
-                                </h3>
-                                <div className="flex flex-wrap justify-center gap-4">
-                                    {project.links.map((link: any, index: number) => (
-                                        <a
-                                            key={index}
-                                            href={link.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-[#941c1d] hover:border-[#941c1d] transition-all duration-300 transform hover:-translate-y-1"
-                                        >
-                                            {getLinkIcon(link.type)}
-                                            <span className="font-medium">{getLinkLabel(link.type)}</span>
-                                            <LinkIcon className="w-3 h-3 opacity-0 -ml-2 group-hover:opacity-50 group-hover:ml-0 transition-all" />
-                                        </a>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
+
+                {/* Project Links Section - Moved below hero */}
+                {project.links && Array.isArray(project.links) && project.links.length > 0 && (
+                    <section className="bg-[#f8f2d8] py-12 border-b border-[#6e1516]/10">
+                        <div className="container mx-auto px-4 text-center">
+                            <h3 className="text-[#941c1d] text-sm font-bold uppercase tracking-widest mb-6">
+                                Links do Projeto
+                            </h3>
+                            <div className="flex flex-wrap justify-center gap-4">
+                                {project.links.map((link: any, index: number) => (
+                                    <a
+                                        key={index}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group flex items-center gap-2 px-6 py-3 bg-white border border-[#941c1d]/20 rounded-full text-[#941c1d] hover:bg-[#941c1d] hover:text-white transition-all duration-300 transform hover:-translate-y-1 shadow-sm hover:shadow-md"
+                                    >
+                                        {getLinkIcon(link.type)}
+                                        <span className="font-medium">{getLinkLabel(link.type)}</span>
+                                        <LinkIcon className="w-3 h-3 opacity-0 -ml-2 group-hover:opacity-50 group-hover:ml-0 transition-all" />
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* Content */}
                 <article className="container mx-auto px-4 max-w-4xl py-20">
