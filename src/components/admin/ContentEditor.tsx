@@ -2,15 +2,20 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase'
-import { ArrowLeft, Save, Loader2 } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
+import { ArrowLeft, Save, Loader2, Plus, X, Globe, Instagram, Facebook, Music, Video } from 'lucide-react'
 import { BlockEditor } from './blocks/BlockEditor'
 import { ImageUploader } from './ImageUploader'
 
 interface ContentEditorProps {
     type: 'blogs' | 'projects'
     initialData?: any
+}
+
+interface ProjectLink {
+    type: 'website' | 'instagram' | 'spotify' | 'facebook' | 'tiktok'
+    url: string
 }
 
 export function ContentEditor({ type, initialData }: ContentEditorProps) {
@@ -32,6 +37,7 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
     const [isFeatured, setIsFeatured] = useState<boolean>(initialData?.is_featured || false)
     const [projectStatus, setProjectStatus] = useState<string>(initialData?.project_status || 'Em Processo')
     const [progress, setProgress] = useState<number>(initialData?.progress || 0)
+    const [links, setLinks] = useState<ProjectLink[]>(Array.isArray(initialData?.links) ? initialData.links : [])
 
     // Initialize content as Block[]
     const [blocks, setBlocks] = useState<any[]>(
@@ -44,6 +50,30 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
             setSlug(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''))
         }
     }, [title, initialData])
+
+    const addLink = () => {
+        setLinks([...links, { type: 'website', url: '' }])
+    }
+
+    const removeLink = (index: number) => {
+        setLinks(links.filter((_, i) => i !== index))
+    }
+
+    const updateLink = (index: number, field: keyof ProjectLink, value: string) => {
+        const newLinks = [...links]
+        newLinks[index] = { ...newLinks[index], [field]: value }
+        setLinks(newLinks)
+    }
+
+    const getLinkIcon = (type: string) => {
+        switch (type) {
+            case 'instagram': return <Instagram className="w-4 h-4" />
+            case 'facebook': return <Facebook className="w-4 h-4" />
+            case 'spotify': return <Music className="w-4 h-4" />
+            case 'tiktok': return <Video className="w-4 h-4" />
+            default: return <Globe className="w-4 h-4" />
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -69,6 +99,7 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
                 formData.is_featured = isFeatured
                 formData.project_status = projectStatus
                 formData.progress = progress
+                formData.links = links
             }
 
             let result
@@ -252,6 +283,62 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
                                         onChange={(e) => setProgress(Number(e.target.value))}
                                         className="w-full accent-[#941c1d]"
                                     />
+                                </div>
+
+                                <hr className="border-gray-100 my-4" />
+                                <div className="flex items-center justify-between">
+                                    <h4 className="font-semibold text-gray-900 text-sm">Links do Projeto</h4>
+                                    <button
+                                        type="button"
+                                        onClick={addLink}
+                                        className="p-1 rounded-full hover:bg-gray-100 text-[#941c1d] transition-colors"
+                                        title="Adicionar Link"
+                                    >
+                                        <Plus className="w-5 h-5" />
+                                    </button>
+                                </div>
+                                <div className="space-y-3">
+                                    {links.map((link, index) => (
+                                        <div key={index} className="flex gap-2 items-start bg-gray-50 p-2 rounded-md group">
+                                            <div className="flex-1 space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="text-gray-500">
+                                                        {getLinkIcon(link.type)}
+                                                    </div>
+                                                    <select
+                                                        value={link.type}
+                                                        onChange={(e) => updateLink(index, 'type', e.target.value as ProjectLink['type'])}
+                                                        className="flex-1 bg-white border-gray-200 text-xs rounded-md shadow-sm focus:border-[#941c1d] focus:ring-[#941c1d] py-1"
+                                                    >
+                                                        <option value="website">Website</option>
+                                                        <option value="instagram">Instagram</option>
+                                                        <option value="spotify">Spotify</option>
+                                                        <option value="facebook">Facebook</option>
+                                                        <option value="tiktok">TikTok</option>
+                                                    </select>
+                                                </div>
+                                                <input
+                                                    type="url"
+                                                    value={link.url}
+                                                    onChange={(e) => updateLink(index, 'url', e.target.value)}
+                                                    placeholder="URL do link (https://...)"
+                                                    className="w-full bg-white border-gray-200 text-xs rounded-md shadow-sm focus:border-[#941c1d] focus:ring-[#941c1d] py-1"
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeLink(index)}
+                                                className="text-gray-400 hover:text-red-500 p-1"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {links.length === 0 && (
+                                        <p className="text-xs text-gray-500 italic text-center py-2">
+                                            Nenhum link adicionado
+                                        </p>
+                                    )}
                                 </div>
                             </>
                         )}

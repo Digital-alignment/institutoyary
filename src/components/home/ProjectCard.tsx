@@ -49,7 +49,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <motion.div
                 layoutId={`card-${project.id}`}
                 onClick={() => setIsOpen(true)}
-                className="group relative h-[450px] w-full cursor-pointer overflow-hidden rounded-2xl bg-white shadow-xl transition-all hover:shadow-2xl"
+                className="group relative h-[450px] md:h-[550px] w-full cursor-pointer overflow-hidden rounded-2xl bg-white shadow-xl transition-all hover:shadow-2xl"
                 whileHover={{ y: -5 }}
             >
                 {/* Image Background */}
@@ -82,7 +82,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                         )}
                     </div>
 
-                    <h3 className="mb-2 text-2xl font-bold leading-tight">{project.title}</h3>
+                    <h3 className="mb-1 text-2xl font-bold leading-tight">{project.title}</h3>
 
                     <div className="space-y-3">
                         <p className="line-clamp-2 text-sm text-gray-200">

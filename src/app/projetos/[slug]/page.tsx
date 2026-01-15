@@ -1,3 +1,4 @@
+// ... imports
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -5,7 +6,7 @@ import { createClient } from '@/lib/supabase-server'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Globe, Instagram, Facebook, Music, Video, Link as LinkIcon } from 'lucide-react'
 
 export const revalidate = 60
 
@@ -28,13 +29,33 @@ export default async function ProjetoPage({ params }: Props) {
         notFound()
     }
 
+    const getLinkIcon = (type: string) => {
+        switch (type) {
+            case 'instagram': return <Instagram className="w-5 h-5" />
+            case 'facebook': return <Facebook className="w-5 h-5" />
+            case 'spotify': return <Music className="w-5 h-5" />
+            case 'tiktok': return <Video className="w-5 h-5" />
+            default: return <Globe className="w-5 h-5" />
+        }
+    }
+
+    const getLinkLabel = (type: string) => {
+        switch (type) {
+            case 'instagram': return 'Instagram'
+            case 'facebook': return 'Facebook'
+            case 'spotify': return 'Spotify'
+            case 'tiktok': return 'TikTok'
+            default: return 'Website'
+        }
+    }
+
     return (
         <div className="min-h-screen flex flex-col font-sans bg-white">
             <Header />
 
             <main className="flex-1">
                 {/* Hero Rendering */}
-                <div className="relative h-[60vh] min-h-[500px] w-full bg-gray-900 flex items-center justify-center">
+                <div className="relative h-[85vh] min-h-[600px] w-full bg-gray-900 flex items-center justify-center">
                     {project.cover_image && (
                         <div className="absolute inset-0 opacity-60">
                             <Image
@@ -48,7 +69,7 @@ export default async function ProjetoPage({ params }: Props) {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-                    <div className="relative z-10 container mx-auto px-4 text-center max-w-4xl space-y-6">
+                    <div className="relative z-10 container mx-auto px-4 text-center max-w-4xl space-y-3">
                         <Link
                             href="/projetos"
                             className="inline-flex items-center text-white/80 hover:text-white transition-colors mb-4 hover:-translate-x-1 duration-300"
@@ -56,13 +77,37 @@ export default async function ProjetoPage({ params }: Props) {
                             <ArrowLeft className="w-5 h-5 mr-2" />
                             Todos os Projetos
                         </Link>
-                        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight">
+                        <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold text-white leading-tight tracking-tight">
                             {project.title}
                         </h1>
                         {project.description && (
-                            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto font-light leading-relaxed">
+                            <p className="text-xl md:text-2xl text-gray-200 max-w-2xl mx-auto font-light leading-normal">
                                 {project.description}
                             </p>
+                        )}
+
+                        {/* Project Links Section */}
+                        {project.links && Array.isArray(project.links) && project.links.length > 0 && (
+                            <div className="pt-8 animate-fade-in-up">
+                                <h3 className="text-white/80 text-sm font-medium uppercase tracking-wider mb-4 border-b border-white/20 inline-block pb-1">
+                                    Links do Projeto
+                                </h3>
+                                <div className="flex flex-wrap justify-center gap-4">
+                                    {project.links.map((link: any, index: number) => (
+                                        <a
+                                            key={index}
+                                            href={link.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-[#941c1d] hover:border-[#941c1d] transition-all duration-300 transform hover:-translate-y-1"
+                                        >
+                                            {getLinkIcon(link.type)}
+                                            <span className="font-medium">{getLinkLabel(link.type)}</span>
+                                            <LinkIcon className="w-3 h-3 opacity-0 -ml-2 group-hover:opacity-50 group-hover:ml-0 transition-all" />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
                         )}
                     </div>
                 </div>
