@@ -66,7 +66,7 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
             }
 
             if (type === 'projects') {
-                formData.isFeatured = isFeatured
+                formData.is_featured = isFeatured
                 formData.project_status = projectStatus
                 formData.progress = progress
             }
