@@ -39,9 +39,10 @@ export function ImageUploader({ value, onChange, className = '', height = 'min-h
                 .getPublicUrl(filePath)
 
             onChange(publicUrl)
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error uploading image:', error)
-            alert('Error uploading image. Please check permissions and try again.')
+            const message = error.message || 'Unknown error'
+            alert(`Error uploading image: ${message}. Please check if the '${bucket}' storage bucket exists and has correct permissions.`)
         } finally {
             setIsUploading(false)
         }

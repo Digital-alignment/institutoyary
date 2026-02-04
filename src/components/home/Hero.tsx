@@ -9,33 +9,44 @@ import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
-const HERO_IMAGES = [
-    { src: '/herohome-1.jpg', alt: 'Floresta Amazônica' },
-    { src: '/herohome-2.jpg', alt: 'Cultura Indígena' },
-    { src: '/herohome-3.jpg', alt: 'Comunidade em Círculo' },
-]
+interface ButtonConfig {
+    text: string
+    url: string
+}
 
 interface HeroProps {
     title?: string;
     subtitle?: string;
+    text?: string;
+    slides?: { image: string, alt?: string }[];
+    button1?: ButtonConfig;
+    button2?: ButtonConfig;
 }
 
-export function Hero({ title, subtitle }: HeroProps) {
+const DEFAULT_IMAGES = [
+    { image: '/herohome-1.jpg', alt: 'Floresta Amazônica' },
+    { image: '/herohome-2.jpg', alt: 'Cultura Indígena' },
+    { image: '/herohome-3.jpg', alt: 'Comunidade em Círculo' },
+]
+
+export function Hero({ title, subtitle, text, slides, button1, button2 }: HeroProps) {
     const [emblaRef] = useEmblaCarousel({ loop: true, duration: 60 }, [
         AutoPlay({ delay: 6000, stopOnInteraction: false }),
         Fade(),
     ])
+
+    const heroSlides = (slides && slides.length > 0) ? slides : DEFAULT_IMAGES;
 
     return (
         <section className="relative h-screen w-full overflow-hidden">
             {/* Background Slider */}
             <div className="absolute inset-0 h-full w-full" ref={emblaRef}>
                 <div className="flex h-full w-full">
-                    {HERO_IMAGES.map((img, index) => (
+                    {heroSlides.map((img, index) => (
                         <div key={index} className="relative h-full min-w-0 flex-[0_0_100%]">
                             <Image
-                                src={img.src}
-                                alt={img.alt}
+                                src={img.image}
+                                alt={img.alt || 'Hero Image'}
                                 fill
                                 priority={index === 0}
                                 className="object-cover"
@@ -56,25 +67,41 @@ export function Hero({ title, subtitle }: HeroProps) {
                         transition={{ duration: 1, delay: 0.5 }}
                         className="space-y-8"
                     >
+                        {/* Title */}
                         <h1 className="mx-auto max-w-5xl text-5xl font-bold leading-[0.9] tracking-tight md:text-7xl lg:text-8xl drop-shadow-lg">
                             {title || "Atuar no mundo hoje cooperando para regeneração"}
                         </h1>
 
-                        <p className="mx-auto max-w-2xl text-xl font-medium md:text-2xl text-white/90 drop-shadow-md">
-                            {subtitle || "Co-criando possibilidades de um futuro belo para as gerações que virão."}
-                        </p>
+                        {/* Subtitle */}
+                        {subtitle && (
+                            <p className="mx-auto max-w-2xl text-xl font-bold md:text-3xl text-white/90 drop-shadow-md">
+                                {subtitle}
+                            </p>
+                        )}
+
+                        {/* Text */}
+                        {text && (
+                            <p className="mx-auto max-w-2xl text-lg md:text-xl text-white/80 drop-shadow-md font-light">
+                                {text}
+                            </p>
+                        )}
 
                         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row pt-8">
-                            <Link href="/projetos">
-                                <Button size="lg" className="h-14 rounded-full bg-[#941c1d] px-8 text-lg font-bold hover:bg-[#7a1617] hover:scale-105 transition-all shadow-lg shadow-[#941c1d]/30">
-                                    Conheça Nossos Projetos
-                                </Button>
-                            </Link>
-                            <Link href="/sobre">
-                                <Button size="lg" variant="outline" className="h-14 rounded-full border-2 border-white bg-transparent px-8 text-lg font-bold text-white hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all">
-                                    Saiba Mais Sobre Nós
-                                </Button>
-                            </Link>
+                            {button1 && button1.text && (
+                                <Link href={button1.url || '#'}>
+                                    <Button size="lg" className="h-14 rounded-full bg-[#941c1d] px-8 text-lg font-bold hover:bg-[#7a1617] hover:scale-105 transition-all shadow-lg shadow-[#941c1d]/30">
+                                        {button1.text}
+                                    </Button>
+                                </Link>
+                            )}
+
+                            {button2 && button2.text && (
+                                <Link href={button2.url || '#'}>
+                                    <Button size="lg" variant="outline" className="h-14 rounded-full border-2 border-white bg-transparent px-8 text-lg font-bold text-white hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all">
+                                        {button2.text}
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </motion.div>
                 </div>
