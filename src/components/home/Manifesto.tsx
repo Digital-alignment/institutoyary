@@ -1,67 +1,42 @@
 'use client'
 
 import React from 'react'
-import { Sprout, Users, Heart, Globe } from 'lucide-react'
-
 import { motion } from 'framer-motion'
+import { useSiteSettings } from '@/hooks/useSiteSettings'
 
 export function Manifesto() {
-    const values = [
-        {
-            icon: <Sprout className="h-10 w-10 text-[#941c1d]" />,
-            title: "Somos Natureza",
-            description: "Resgate da percepção de sermos parte integrante da Teia da vida."
-        },
-        {
-            icon: <Globe className="h-10 w-10 text-[#941c1d]" />,
-            title: "Futuro Ancestral",
-            description: "Conexão profunda com tradições e memórias para guiar o amanhã."
-        },
-        {
-            icon: <Users className="h-10 w-10 text-[#941c1d]" />,
-            title: "Diversidade e Com-unidade",
-            description: "Valorização das diferenças e serviço amoroso à coletividade."
-        },
-        {
-            icon: <Heart className="h-10 w-10 text-[#941c1d]" />,
-            title: "Percepção Sistêmica",
-            description: "Visão integrada de que tudo está interligado e é interdependente."
-        }
-    ]
+    const { settings } = useSiteSettings()
+    const { home_layout } = settings
 
     return (
-        <section className="bg-[#f8f2d8] py-24 text-gray-900">
-            <div className="container mx-auto px-4 md:px-8">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="mx-auto max-w-4xl text-center mb-20"
-                >
-                    <h2 className="text-sm font-bold uppercase tracking-widest text-[#941c1d] mb-4">Nossa Missão</h2>
-                    <p className="text-3xl font-medium leading-relaxed md:text-5xl font-serif">
-                        "Cooperar para a regeneração, co-criando as possibilidades de um futuro belo para as gerações que irão viver na Terra e com ela o legado que estamos semeando".
-                    </p>
-                </motion.div>
+        <section className="relative overflow-hidden bg-[#faefe0] py-20 md:py-32">
+            {/* Background Graphic Element - Simplified Yary pattern */}
+            <div className="absolute -left-20 top-0 h-96 w-96 rounded-full bg-[#e8dccb] opacity-50 blur-3xl mix-blend-multiply" />
+            <div className="absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-[#fcead9] opacity-50 blur-3xl mix-blend-multiply" />
 
-                <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4"
-                >
-                    {values.map((item, index) => (
-                        <div key={index} className="flex flex-col items-center text-center space-y-4 group">
-                            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#e8debc] transition-transform duration-500 group-hover:scale-110 group-hover:bg-[#d8ceac]">
-                                {item.icon}
-                            </div>
-                            <h3 className="text-xl font-bold">{item.title}</h3>
-                            <p className="text-gray-700 leading-relaxed">{item.description}</p>
+            <div className="container relative z-10 mx-auto px-4 md:px-8">
+                <div className="mx-auto max-w-4xl text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <h2 className="mb-8 text-4xl font-bold font-serif text-[#941c1d] md:text-6xl">
+                            {home_layout.manifesto_title || "Manifesto Yary"}
+                        </h2>
+
+                        <div className="prose prose-lg mx-auto text-gray-700 md:prose-xl">
+                            <p className="whitespace-pre-line leading-relaxed">
+                                {home_layout.manifesto_text || "Acreditamos na força da união e na sabedoria ancestral para construir um futuro onde a natureza e a humanidade prosperem juntas.\n\nSomos guardiões de sonhos e semeadores de esperança."}
+                            </p>
                         </div>
-                    ))}
-                </motion.div>
+
+                        <div className="mt-12">
+                            <span className="inline-block h-1 w-24 bg-[#941c1d] rounded-full" />
+                        </div>
+                    </motion.div>
+                </div>
             </div>
         </section>
     )

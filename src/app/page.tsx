@@ -12,6 +12,8 @@ import { ArrowRight } from "lucide-react";
 import * as motion from "framer-motion/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Loader2 } from "lucide-react";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { Partners } from "@/components/home/Partners";
 
 export default function Home() {
   const { settings, loading } = useSiteSettings();
@@ -23,6 +25,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
+      <AnnouncementBar />
       <Header />
 
       <main className="flex-1 flex flex-col pt-0">
@@ -113,6 +116,9 @@ export default function Home() {
         {home_layout.show_blog && (
           <FeaturedBlogs blogIds={home_layout.featured_blogs} />
         )}
+
+        {/* 6. Partners Section */}
+        <Partners />
 
         {/* 6. Manifesto (Values) - Keeping as optional or bottom section */}
         {/* If user didn't ask to remove it, we keep it as 'extra' or remove if conflicts. User said 'Next section blog saberes', implying end. But Manifesto is good content. I'll leave it at the end. */}
