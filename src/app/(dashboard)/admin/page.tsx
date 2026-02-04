@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function AdminDashboard() {
     const [loading, setLoading] = useState(true)
@@ -59,18 +60,24 @@ export default function AdminDashboard() {
                 <div className="mt-6">
                     <p className="text-lg">Welcome, Admin <strong>{userEmail}</strong></p>
                     <div className="mt-8 grid gap-4 grid-cols-1 md:grid-cols-2">
-                        <div className="rounded border p-4 hover:shadow-lg transition bg-[#fdfaf1] border-[#6e1516]">
-                            <h3 className="font-semibold text-[#941c1d]">Manage Projects</h3>
-                            <p className="text-sm mt-2">Create, edit, or delete projects.</p>
-                        </div>
-                        <div className="rounded border p-4 hover:shadow-lg transition bg-[#fdfaf1] border-[#6e1516]">
-                            <h3 className="font-semibold text-[#941c1d]">Manage Blogs</h3>
-                            <p className="text-sm mt-2">Write and publish blog posts.</p>
-                        </div>
-                        <div className="rounded border p-4 hover:shadow-lg transition bg-[#fdfaf1] border-[#6e1516]">
-                            <h3 className="font-semibold text-[#941c1d]">CMS Settings</h3>
-                            <p className="text-sm mt-2">Configure platform settings.</p>
-                        </div>
+                        <Link href="/admin/projetos" className="block">
+                            <div className="rounded border p-4 hover:shadow-lg transition bg-[#fdfaf1] border-[#6e1516] h-full">
+                                <h3 className="font-semibold text-[#941c1d]">Manage Projects</h3>
+                                <p className="text-sm mt-2">Create, edit, or delete projects.</p>
+                            </div>
+                        </Link>
+                        <Link href="/admin/saberes" className="block">
+                            <div className="rounded border p-4 hover:shadow-lg transition bg-[#fdfaf1] border-[#6e1516] h-full">
+                                <h3 className="font-semibold text-[#941c1d]">Manage Blogs</h3>
+                                <p className="text-sm mt-2">Write and publish blog posts.</p>
+                            </div>
+                        </Link>
+                        <Link href="/admin/settings" className="block">
+                            <div className="rounded border p-4 hover:shadow-lg transition bg-[#fdfaf1] border-[#6e1516] h-full">
+                                <h3 className="font-semibold text-[#941c1d]">CMS Settings</h3>
+                                <p className="text-sm mt-2">Configure platform settings.</p>
+                            </div>
+                        </Link>
                     </div>
                 </div>
             </div>

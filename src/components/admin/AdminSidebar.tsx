@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, FileText, FolderKanban, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, FileText, FolderKanban, Settings, LogOut, Users, ClipboardList } from 'lucide-react'
 
 const navItems = [
     {
@@ -21,6 +21,16 @@ const navItems = [
         label: 'Projetos',
         href: '/admin/projetos',
         icon: FolderKanban
+    },
+    {
+        label: 'Usuários',
+        href: '/admin/users',
+        icon: Users
+    },
+    {
+        label: 'Formulários',
+        href: '/admin/forms',
+        icon: ClipboardList
     },
     {
         label: 'Configurações',

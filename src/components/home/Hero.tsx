@@ -15,7 +15,12 @@ const HERO_IMAGES = [
     { src: '/herohome-3.jpg', alt: 'Comunidade em Círculo' },
 ]
 
-export function Hero() {
+interface HeroProps {
+    title?: string;
+    subtitle?: string;
+}
+
+export function Hero({ title, subtitle }: HeroProps) {
     const [emblaRef] = useEmblaCarousel({ loop: true, duration: 60 }, [
         AutoPlay({ delay: 6000, stopOnInteraction: false }),
         Fade(),
@@ -52,11 +57,11 @@ export function Hero() {
                         className="space-y-8"
                     >
                         <h1 className="mx-auto max-w-5xl text-5xl font-bold leading-[0.9] tracking-tight md:text-7xl lg:text-8xl drop-shadow-lg">
-                            Atuar no mundo hoje cooperando para regeneração
+                            {title || "Atuar no mundo hoje cooperando para regeneração"}
                         </h1>
 
                         <p className="mx-auto max-w-2xl text-xl font-medium md:text-2xl text-white/90 drop-shadow-md">
-                            Co-criando possibilidades de um futuro belo para as gerações que virão.
+                            {subtitle || "Co-criando possibilidades de um futuro belo para as gerações que virão."}
                         </p>
 
                         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row pt-8">

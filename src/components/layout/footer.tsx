@@ -1,9 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Facebook, Instagram, Youtube, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function Footer() {
+    const { settings } = useSiteSettings();
+    const social = settings.social_links;
+
     return (
         <footer className="bg-primary text-light-text">
             <div className="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -11,18 +17,32 @@ export function Footer() {
                 {/* Brand Column */}
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-light-text text-primary flex items-center justify-center font-bold">
-                            IY
-                        </div>
-                        <span className="font-bold text-xl">Instituto Yary</span>
+                        {settings.logo_url ? (
+                            <img
+                                src={settings.logo_url}
+                                alt={settings.site_title}
+                                className="w-10 h-10 rounded-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-10 h-10 rounded-full bg-light-text text-primary flex items-center justify-center font-bold">
+                                IY
+                            </div>
+                        )}
+                        <span className="font-bold text-xl">{settings.site_title}</span>
                     </div>
                     <p className="text-light-text/80 text-sm font-light">
-                        Atuar no mundo hoje cooperando para regeneração e co-criando um futuro belo.
+                        {settings.site_description || "Atuar no mundo hoje cooperando para regeneração e co-criando um futuro belo."}
                     </p>
                     <div className="flex gap-4 mt-2">
-                        <Link href="#" className="hover:text-accent transition-colors"><Instagram className="h-5 w-5" /></Link>
-                        <Link href="#" className="hover:text-accent transition-colors"><Facebook className="h-5 w-5" /></Link>
-                        <Link href="#" className="hover:text-accent transition-colors"><Youtube className="h-5 w-5" /></Link>
+                        {social.instagram && (
+                            <Link href={social.instagram} className="hover:text-accent transition-colors"><Instagram className="h-5 w-5" /></Link>
+                        )}
+                        {social.facebook && (
+                            <Link href={social.facebook} className="hover:text-accent transition-colors"><Facebook className="h-5 w-5" /></Link>
+                        )}
+                        {social.youtube && (
+                            <Link href={social.youtube} className="hover:text-accent transition-colors"><Youtube className="h-5 w-5" /></Link>
+                        )}
                     </div>
                 </div>
 
@@ -32,8 +52,7 @@ export function Footer() {
                     <nav className="flex flex-col gap-2 text-sm text-light-text/80">
                         <Link href="/sobre" className="hover:text-white transition-colors">Nossa História</Link>
                         <Link href="/projetos" className="hover:text-white transition-colors">Projetos</Link>
-                        <Link href="/blog" className="hover:text-white transition-colors">Blog / Saberes</Link>
-
+                        <Link href="/saberes" className="hover:text-white transition-colors">Blog / Saberes</Link>
                     </nav>
                 </div>
 
@@ -45,10 +64,12 @@ export function Footer() {
                             <MapPin className="h-4 w-4 mt-1 shrink-0" />
                             <span>Itacaré - Bahia<br />Alto Xingu & Mata Atlântica</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 shrink-0" />
-                            <a href="mailto:contato@institutoyary.org" className="hover:underline">contato@institutoyary.org</a>
-                        </div>
+                        {social.email && (
+                            <div className="flex items-center gap-2">
+                                <Mail className="h-4 w-4 shrink-0" />
+                                <a href={`mailto:${social.email}`} className="hover:underline">{social.email}</a>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -71,7 +92,7 @@ export function Footer() {
 
             <div className="border-t border-white/10">
                 <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-light-text/60">
-                    <p>&copy; {new Date().getFullYear()} Instituto Yary. Todos os direitos reservados.</p>
+                    <p>&copy; {new Date().getFullYear()} {settings.site_title}. Todos os direitos reservados.</p>
                     <div className="flex gap-4">
                         <Link href="#" className="hover:text-white">Termos de Uso</Link>
                         <Link href="#" className="hover:text-white">Política de Privacidade</Link>

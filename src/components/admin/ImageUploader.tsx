@@ -9,9 +9,10 @@ interface ImageUploaderProps {
     onChange: (url: string) => void
     className?: string
     height?: string
+    bucket?: string
 }
 
-export function ImageUploader({ value, onChange, className = '', height = 'min-h-[200px]' }: ImageUploaderProps) {
+export function ImageUploader({ value, onChange, className = '', height = 'min-h-[200px]', bucket = 'cms-images' }: ImageUploaderProps) {
     const [isUploading, setIsUploading] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const supabase = createClient()
@@ -28,13 +29,13 @@ export function ImageUploader({ value, onChange, className = '', height = 'min-h
 
             // Allow user to define bucket but defaults to cms-images
             const { error: uploadError } = await supabase.storage
-                .from('cms-images')
+                .from(bucket)
                 .upload(filePath, file)
 
             if (uploadError) throw uploadError
 
             const { data: { publicUrl } } = supabase.storage
-                .from('cms-images')
+                .from(bucket)
                 .getPublicUrl(filePath)
 
             onChange(publicUrl)

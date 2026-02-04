@@ -6,21 +6,30 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { ContactModal } from "@/components/contact-modal";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function Header() {
     const [isContactOpen, setIsContactOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { settings } = useSiteSettings();
 
     return (
         <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-primary/10">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 cursor-pointer relative z-50">
-                    {/* Logo placeholder - replace with Image when available */}
-                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-light-text font-bold text-xs">
-                        IY
-                    </div>
+                    {settings.logo_url ? (
+                        <img
+                            src={settings.logo_url}
+                            alt={settings.site_title}
+                            className="w-8 h-8 rounded-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-light-text font-bold text-xs">
+                            IY
+                        </div>
+                    )}
                     <span className="font-bold text-primary text-xl hidden sm:block">
-                        Instituto Yary
+                        {settings.site_title}
                     </span>
                 </Link>
 
@@ -69,11 +78,19 @@ export function Header() {
                     >
                         <div className="container mx-auto px-4 h-16 flex items-center justify-between border-b border-primary/10">
                             <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-light-text font-bold text-xs">
-                                    IY
-                                </div>
+                                {settings.logo_url ? (
+                                    <img
+                                        src={settings.logo_url}
+                                        alt={settings.site_title}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-light-text font-bold text-xs">
+                                        IY
+                                    </div>
+                                )}
                                 <span className="font-bold text-primary text-xl">
-                                    Instituto Yary
+                                    {settings.site_title}
                                 </span>
                             </Link>
                             <Button
