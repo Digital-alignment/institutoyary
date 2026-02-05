@@ -6,6 +6,16 @@ export interface ButtonConfig {
     url: string
 }
 
+export interface FooterLink {
+    text: string
+    url: string
+}
+
+export interface FooterColumn {
+    title: string
+    links: FooterLink[]
+}
+
 export interface SiteSettings {
     site_title: string
     site_description: string
@@ -111,6 +121,16 @@ export interface SiteSettings {
         cta_button_text: string
         cta_button_url: string
     }
+
+    // Footer Layout
+    footer_layout: {
+        show_newsletter: boolean
+        newsletter_title: string
+        newsletter_text: string
+        address: string
+        copyright_text: string
+        columns: FooterColumn[]
+    }
 }
 
 const defaultSettings: SiteSettings = {
@@ -208,6 +228,33 @@ const defaultSettings: SiteSettings = {
         cta_subtitle: 'Faça parte dessa rede de regeneração e transformação.',
         cta_button_text: 'Apoie Nossos Projetos',
         cta_button_url: '/projetos'
+    },
+
+    footer_layout: {
+        show_newsletter: true,
+        newsletter_title: 'Fique por dentro',
+        newsletter_text: 'Receba novidades e atualizações sobre nossos projetos.',
+        address: 'Rua Pedro Longo, 155 - Pituba, Itacaré - BA, 45530-000',
+        copyright_text: '',
+        columns: [
+            {
+                title: 'Institucional',
+                links: [
+                    { text: 'Sobre Nós', url: '/sobre' },
+                    { text: 'Projetos', url: '/projetos' },
+                    { text: 'Transparência', url: '/transparencia' },
+                    { text: 'Contato', url: '/contato' }
+                ]
+            },
+            {
+                title: 'Apoie',
+                links: [
+                    { text: 'Faça uma Doação', url: '/doe' },
+                    { text: 'Seja Voluntário', url: '/voluntario' },
+                    { text: 'Parcerias', url: '/parcerias' }
+                ]
+            }
+        ]
     }
 }
 
@@ -230,7 +277,8 @@ export function useSiteSettings() {
                     ...data,
                     social_links: { ...prev.social_links, ...data.social_links },
                     home_layout: { ...prev.home_layout, ...data.home_layout },
-                    about_layout: { ...prev.about_layout, ...defaultSettings.about_layout, ...data.about_layout }
+                    about_layout: { ...prev.about_layout, ...defaultSettings.about_layout, ...data.about_layout },
+                    footer_layout: { ...prev.footer_layout, ...defaultSettings.footer_layout, ...data.footer_layout }
                 }))
             }
             setLoading(false)

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
-import { Loader2, Save, Globe, Smartphone, Home, Plus, Trash2, CheckCircle, AlertCircle, X } from 'lucide-react'
+import { Loader2, Save, Globe, Smartphone, Home, Plus, Trash2, CheckCircle, AlertCircle, X, Star, PanelBottom, Mail, MapPin } from 'lucide-react'
 import { ImageUploader } from '@/components/admin/ImageUploader'
 import { FileUploader } from '@/components/admin/FileUploader'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -12,6 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { cn } from '@/lib/utils'
 import { CollapsibleSection } from '@/components/admin/CollapsibleSection'
 import { IconPicker } from '@/components/admin/IconPicker'
+
+// Type definitions for clarity
+type FooterLink = { text: string; url: string }
+type FooterColumn = { title: string; links: FooterLink[] }
 
 // Toast Component
 interface ToastProps {
@@ -49,7 +53,7 @@ export default function AdminSettingsPage() {
     const supabase = createClient()
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [activeTab, setActiveTab] = useState<'general' | 'social' | 'home'>('general')
+    const [activeTab, setActiveTab] = useState<'general' | 'social' | 'home' | 'about' | 'footer'>('general')
     const [blogs, setBlogs] = useState<any[]>([])
     const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null)
 
@@ -121,6 +125,15 @@ export default function AdminSettingsPage() {
             // CTA
             show_cta: true,
             cta_title: '', cta_subtitle: '', cta_button_text: '', cta_button_url: ''
+        },
+        // Footer Layout
+        footer_layout: {
+            show_newsletter: true,
+            newsletter_title: '',
+            newsletter_text: '',
+            address: '',
+            columns: [] as FooterColumn[],
+            copyright_text: ''
         }
     })
 
@@ -165,6 +178,23 @@ export default function AdminSettingsPage() {
                         values_list: data.about_layout?.values_list || [],
                         territories_list: data.about_layout?.territories_list || [],
                         transparency_documents: data.about_layout?.transparency_documents || []
+                    },
+                    footer_layout: {
+                        ...settings.footer_layout,
+                        ...data.footer_layout,
+                        columns: data.footer_layout?.columns || [
+                            {
+                                title: 'Institucional',
+                                links: [
+                                    { text: 'Nossa História', url: '/sobre' },
+                                    { text: 'Projetos', url: '/projetos' },
+                                    { text: 'Blog / Saberes', url: '/saberes' }
+                                ]
+                            }
+                        ],
+                        newsletter_title: data.footer_layout?.newsletter_title || 'Fique por dentro',
+                        newsletter_text: data.footer_layout?.newsletter_text || 'Receba novidades e ações em seu e-mail.',
+                        address: data.footer_layout?.address || 'Itacaré - Bahia\nAlto Xingu & Mata Atlântica'
                     }
                 })
             }
@@ -186,6 +216,7 @@ export default function AdminSettingsPage() {
                     social_links: settings.social_links,
                     home_layout: settings.home_layout,
                     about_layout: settings.about_layout,
+                    footer_layout: settings.footer_layout,
                     updated_at: new Date().toISOString()
                 })
 
@@ -268,6 +299,52 @@ export default function AdminSettingsPage() {
         updateAbout('transparency_documents', newDocs);
     }
 
+    // Footer Helpers
+    const updateFooter = (key: string, value: any) => {
+        setSettings({
+            ...settings,
+            footer_layout: { ...settings.footer_layout, [key]: value }
+        })
+    }
+
+    const updateFooterColumn = (index: number, field: keyof FooterColumn, value: any) => {
+        const newColumns = [...settings.footer_layout.columns];
+        if (!newColumns[index]) return;
+        newColumns[index] = { ...newColumns[index], [field]: value };
+        updateFooter('columns', newColumns);
+    }
+
+    const addFooterColumn = () => {
+        const newColumns = [...settings.footer_layout.columns, { title: 'Nova Coluna', links: [] }];
+        updateFooter('columns', newColumns);
+    }
+
+    const removeFooterColumn = (index: number) => {
+        const newColumns = settings.footer_layout.columns.filter((_: any, i: number) => i !== index);
+        updateFooter('columns', newColumns);
+    }
+
+    const updateFooterLink = (colIndex: number, linkIndex: number, field: keyof FooterLink, value: string) => {
+        const newColumns = [...settings.footer_layout.columns];
+        if (!newColumns[colIndex] || !newColumns[colIndex].links[linkIndex]) return;
+        newColumns[colIndex].links[linkIndex] = { ...newColumns[colIndex].links[linkIndex], [field]: value };
+        updateFooter('columns', newColumns);
+    }
+
+    const addFooterLink = (colIndex: number) => {
+        const newColumns = [...settings.footer_layout.columns];
+        if (!newColumns[colIndex]) return;
+        newColumns[colIndex].links.push({ text: 'Novo Link', url: '#' });
+        updateFooter('columns', newColumns);
+    }
+
+    const removeFooterLink = (colIndex: number, linkIndex: number) => {
+        const newColumns = [...settings.footer_layout.columns];
+        if (!newColumns[colIndex]) return;
+        newColumns[colIndex].links = newColumns[colIndex].links.filter((_: any, i: number) => i !== linkIndex); // Fix syntax and types
+        updateFooter('columns', newColumns);
+    }
+
     // Ensure we have at least 3 empty slots if less
     const heroSlides = settings.home_layout.hero_slides || [];
     const displaySlides = [...heroSlides];
@@ -282,6 +359,7 @@ export default function AdminSettingsPage() {
         { id: 'social', label: 'Contato & Social', icon: Smartphone },
         { id: 'home', label: 'Home Page', icon: Home },
         { id: 'about', label: 'Página Sobre', icon: Globe },
+        { id: 'footer', label: 'Rodapé', icon: PanelBottom },
     ]
 
     return (
@@ -798,249 +876,202 @@ export default function AdminSettingsPage() {
 
                 {/* ABOUT TAB */}
                 {activeTab === 'about' && (
-                    <div className="space-y-4">
-                        {/* HERO */}
-                        <CollapsibleSection
-                            title="Hero (Banner Principal)"
-                            subtitle="Imagem de destaque e título principal da página sobre."
-                            isVisible={settings.about_layout?.show_hero}
-                            onVisibilityChange={(checked) => updateAbout('show_hero', checked)}
-                            defaultOpen={true}
-                        >
-                            <div className="space-y-6">
-                                <div className="p-4 border border-dashed rounded-lg bg-muted/20 w-full animate-in fade-in zoom-in duration-300">
-                                    <div className="w-full max-w-md mx-auto">
-                                        <ImageUploader
-                                            value={settings.about_layout?.hero_image || ''}
-                                            onChange={(url) => updateAbout('hero_image', url)}
-                                            bucket="site-assets"
-                                            height="h-52"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-muted-foreground mt-3 text-center">Imagem de fundo do banner (Recomendado: 1920x1080px)</p>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Título Principal</label>
-                                        <Input
-                                            value={settings.about_layout?.hero_title || ''}
-                                            onChange={(e) => updateAbout('hero_title', e.target.value)}
-                                            placeholder="Ex: Nossa Jornada"
-                                            className="text-lg font-semibold"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Subtítulo</label>
-                                        <Input
-                                            value={settings.about_layout?.hero_subtitle || ''}
-                                            onChange={(e) => updateAbout('hero_subtitle', e.target.value)}
-                                            placeholder="Uma frase curta de impacto"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </CollapsibleSection>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Configurações da Página Sobre</CardTitle>
+                            <CardDescription>Edite o conteúdo da página /sobre.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {/* Hero Section */}
 
-                        {/* HISTORY */}
-                        <CollapsibleSection
-                            title="História e Identidade"
-                            subtitle="Conte sua história e destaque sua origem."
-                            isVisible={settings.about_layout?.show_history}
-                            onVisibilityChange={(checked) => updateAbout('show_history', checked)}
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-4 order-2 md:order-1">
-                                    <Input
-                                        placeholder="Tag (ex: Nossa História)"
-                                        value={settings.about_layout?.history_tag || ''}
-                                        onChange={(e) => updateAbout('history_tag', e.target.value)}
-                                        className="w-1/2"
-                                    />
-                                    <Input
-                                        placeholder="Título da Seção"
-                                        value={settings.about_layout?.history_title || ''}
-                                        onChange={(e) => updateAbout('history_title', e.target.value)}
-                                        className="font-semibold text-lg"
-                                    />
-                                    <textarea
-                                        placeholder="Texto principal da história..."
-                                        value={settings.about_layout?.history_text || ''}
-                                        onChange={(e) => updateAbout('history_text', e.target.value)}
-                                        className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[150px]"
-                                    />
-                                </div>
-                                <div className="order-1 md:order-2 space-y-2">
-                                    <p className="text-sm font-medium mb-2">Imagem Lateral</p>
-                                    <div className="rounded-xl overflow-hidden shadow-sm border">
-                                        <ImageUploader
-                                            value={settings.about_layout?.history_image || ''}
-                                            onChange={(url) => updateAbout('history_image', url)}
-                                            bucket="site-assets"
-                                            height="h-64"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-6 p-5 bg-[#f8f2d8]/30 rounded-xl border border-[#f8f2d8] space-y-3">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="w-1 h-6 bg-primary rounded-full"></div>
-                                    <p className="text-sm font-semibold text-primary-dark">Caixa de Destaque</p>
-                                </div>
-                                <Input
-                                    placeholder="Título do Destaque"
-                                    value={settings.about_layout?.history_highlight_title || ''}
-                                    onChange={(e) => updateAbout('history_highlight_title', e.target.value)}
-                                    className="bg-white/80"
-                                />
-                                <textarea
-                                    placeholder="Texto do Destaque..."
-                                    value={settings.about_layout?.history_highlight_text || ''}
-                                    onChange={(e) => updateAbout('history_highlight_text', e.target.value)}
-                                    className="flex w-full rounded-md border border-input bg-white/80 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px]"
-                                />
-                            </div>
-                        </CollapsibleSection>
-
-                        {/* MISSION */}
-                        <CollapsibleSection
-                            title="Missão (Faixa Vermelha)"
-                            subtitle="A seção de alto impacto visual com a frase principal."
-                            isVisible={settings.about_layout?.show_mission}
-                            onVisibilityChange={(checked) => updateAbout('show_mission', checked)}
-                        >
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Citação Principal (Grande)</label>
-                                    <textarea
-                                        value={settings.about_layout?.mission_quote || ''}
-                                        onChange={(e) => updateAbout('mission_quote', e.target.value)}
-                                        className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-lg font-medium ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                        rows={3}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Texto Secundário</label>
-                                    <textarea
-                                        value={settings.about_layout?.mission_text || ''}
-                                        onChange={(e) => updateAbout('mission_text', e.target.value)}
-                                        className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                        rows={3}
-                                    />
-                                </div>
-                            </div>
-                        </CollapsibleSection>
-
-                        {/* VALUES */}
-                        <CollapsibleSection
-                            title="Valores Fundamentais"
-                            subtitle="Liste os valores que definem a organização."
-                            isVisible={settings.about_layout?.show_values}
-                            onVisibilityChange={(checked) => updateAbout('show_values', checked)}
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                <Input
-                                    placeholder="Título da Seção de Valores"
-                                    value={settings.about_layout?.values_title || ''}
-                                    onChange={(e) => updateAbout('values_title', e.target.value)}
-                                    className="font-semibold"
-                                />
-                                <Input
-                                    placeholder="Subtítulo"
-                                    value={settings.about_layout?.values_subtitle || ''}
-                                    onChange={(e) => updateAbout('values_subtitle', e.target.value)}
-                                />
-                            </div>
-
-                            <div className="space-y-4">
-                                <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                    <Star className="w-4 h-4" /> Lista de Valores
-                                </p>
-                                <div className="grid grid-cols-1 gap-4">
-                                    {settings.about_layout?.values_list?.map((val: any, idx: number) => (
-                                        <div key={idx} className="p-4 bg-white border rounded-xl shadow-sm relative group space-y-4 hover:shadow-md transition-shadow">
-                                            <div className="flex gap-6 items-start">
-                                                <div className="w-1/4 space-y-2">
-                                                    <label className="text-xs font-semibold text-muted-foreground">Ícone</label>
-                                                    <IconPicker
-                                                        value={val.icon || 'Star'}
-                                                        onChange={(icon) => updateValueItem(idx, 'icon', icon)}
-                                                    />
-                                                </div>
-                                                <div className="flex-1 space-y-3">
-                                                    <Input
-                                                        placeholder="Título do Valor"
-                                                        value={val.title || ''}
-                                                        onChange={(e) => updateValueItem(idx, 'title', e.target.value)}
-                                                        className="font-medium"
-                                                    />
-                                                    <textarea
-                                                        placeholder="Descrição do valor..."
-                                                        value={val.description || ''}
-                                                        onChange={(e) => updateValueItem(idx, 'description', e.target.value)}
-                                                        className="flex w-full rounded-md border border-input bg-gray-50/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[60px]"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => {
-                                                    const newList = [...settings.about_layout.values_list].filter((_, i) => i !== idx);
-                                                    updateAbout('values_list', newList);
-                                                }}
-                                                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                            {/* HERO */}
+                            <CollapsibleSection
+                                title="Hero (Banner Principal)"
+                                subtitle="Imagem de destaque e título principal da página sobre."
+                                isVisible={settings.about_layout?.show_hero}
+                                onVisibilityChange={(checked) => updateAbout('show_hero', checked)}
+                                defaultOpen={true}
+                            >
+                                <div className="space-y-6">
+                                    <div className="p-4 border border-dashed rounded-lg bg-muted/20 w-full animate-in fade-in zoom-in duration-300">
+                                        <div className="w-full max-w-md mx-auto">
+                                            <ImageUploader
+                                                value={settings.about_layout?.hero_image || ''}
+                                                onChange={(url) => updateAbout('hero_image', url)}
+                                                bucket="site-assets"
+                                                height="h-52"
+                                            />
                                         </div>
-                                    ))}
+                                        <p className="text-xs text-muted-foreground mt-3 text-center">Imagem de fundo do banner (Recomendado: 1920x1080px)</p>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Título Principal</label>
+                                            <Input
+                                                value={settings.about_layout?.hero_title || ''}
+                                                onChange={(e) => updateAbout('hero_title', e.target.value)}
+                                                placeholder="Ex: Nossa Jornada"
+                                                className="text-lg font-semibold"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Subtítulo</label>
+                                            <Input
+                                                value={settings.about_layout?.hero_subtitle || ''}
+                                                onChange={(e) => updateAbout('hero_subtitle', e.target.value)}
+                                                placeholder="Uma frase curta de impacto"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                                <Button
-                                    onClick={() => updateAbout('values_list', [...(settings.about_layout.values_list || []), { icon: 'Star', title: '', description: '' }])}
-                                    variant="outline"
-                                    className="w-full border-dashed py-6 hover:bg-gray-50 hover:border-primary/50 hover:text-primary transition-all"
-                                >
-                                    <Plus className="w-4 h-4 mr-2" /> Adicionar Novo Valor
-                                </Button>
-                            </div>
-                        </CollapsibleSection>
+                            </CollapsibleSection>
 
-                        {/* TERRITORIES */}
-                        <CollapsibleSection
-                            title="Territórios"
-                            subtitle="Regiões onde a organização atua."
-                            isVisible={settings.about_layout?.show_territories}
-                            onVisibilityChange={(checked) => updateAbout('show_territories', checked)}
-                        >
-                            <Input
-                                placeholder="Título da Seção de Territórios"
-                                value={settings.about_layout?.territories_title || ''}
-                                onChange={(e) => updateAbout('territories_title', e.target.value)}
-                                className="mb-6 font-semibold"
-                            />
+                            {/* HISTORY */}
+                            <CollapsibleSection
+                                title="História e Identidade"
+                                subtitle="Conte sua história e destaque sua origem."
+                                isVisible={settings.about_layout?.show_history}
+                                onVisibilityChange={(checked) => updateAbout('show_history', checked)}
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-4 order-2 md:order-1">
+                                        <Input
+                                            placeholder="Tag (ex: Nossa História)"
+                                            value={settings.about_layout?.history_tag || ''}
+                                            onChange={(e) => updateAbout('history_tag', e.target.value)}
+                                            className="w-1/2"
+                                        />
+                                        <Input
+                                            placeholder="Título da Seção"
+                                            value={settings.about_layout?.history_title || ''}
+                                            onChange={(e) => updateAbout('history_title', e.target.value)}
+                                            className="font-semibold text-lg"
+                                        />
+                                        <textarea
+                                            placeholder="Texto principal da história..."
+                                            value={settings.about_layout?.history_text || ''}
+                                            onChange={(e) => updateAbout('history_text', e.target.value)}
+                                            className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[150px]"
+                                        />
+                                    </div>
+                                    <div className="order-1 md:order-2 space-y-2">
+                                        <p className="text-sm font-medium mb-2">Imagem Lateral</p>
+                                        <div className="rounded-xl overflow-hidden shadow-sm border">
+                                            <ImageUploader
+                                                value={settings.about_layout?.history_image || ''}
+                                                onChange={(url) => updateAbout('history_image', url)}
+                                                bucket="site-assets"
+                                                height="h-64"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-6 p-5 bg-[#f8f2d8]/30 rounded-xl border border-[#f8f2d8] space-y-3">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="w-1 h-6 bg-primary rounded-full"></div>
+                                        <p className="text-sm font-semibold text-primary-dark">Caixa de Destaque</p>
+                                    </div>
+                                    <Input
+                                        placeholder="Título do Destaque"
+                                        value={settings.about_layout?.history_highlight_title || ''}
+                                        onChange={(e) => updateAbout('history_highlight_title', e.target.value)}
+                                        className="bg-white/80"
+                                    />
+                                    <textarea
+                                        placeholder="Texto do Destaque..."
+                                        value={settings.about_layout?.history_highlight_text || ''}
+                                        onChange={(e) => updateAbout('history_highlight_text', e.target.value)}
+                                        className="flex w-full rounded-md border border-input bg-white/80 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px]"
+                                    />
+                                </div>
+                            </CollapsibleSection>
 
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* MISSION */}
+                            <CollapsibleSection
+                                title="Missão (Faixa Vermelha)"
+                                subtitle="A seção de alto impacto visual com a frase principal."
+                                isVisible={settings.about_layout?.show_mission}
+                                onVisibilityChange={(checked) => updateAbout('show_mission', checked)}
+                            >
                                 <div className="space-y-4">
-                                    <div className="space-y-3">
-                                        {settings.about_layout?.territories_list?.map((terr: any, idx: number) => (
-                                            <div key={idx} className="p-4 bg-white border rounded-xl relative group space-y-2 hover:border-primary/30 transition-colors">
-                                                <Input
-                                                    placeholder="Região (ex: Bahia)"
-                                                    value={terr.region || ''}
-                                                    onChange={(e) => updateTerritoryItem(idx, 'region', e.target.value)}
-                                                    className="font-medium border-0 border-b rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary shadow-none"
-                                                />
-                                                <textarea
-                                                    placeholder="Descrição da atuação nesta região..."
-                                                    value={terr.description || ''}
-                                                    onChange={(e) => updateTerritoryItem(idx, 'description', e.target.value)}
-                                                    className="flex w-full rounded-md bg-transparent px-0 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-h-[40px] resize-none"
-                                                    rows={2}
-                                                />
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Citação Principal (Grande)</label>
+                                        <textarea
+                                            value={settings.about_layout?.mission_quote || ''}
+                                            onChange={(e) => updateAbout('mission_quote', e.target.value)}
+                                            className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-lg font-medium ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            rows={3}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Texto Secundário</label>
+                                        <textarea
+                                            value={settings.about_layout?.mission_text || ''}
+                                            onChange={(e) => updateAbout('mission_text', e.target.value)}
+                                            className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            rows={3}
+                                        />
+                                    </div>
+                                </div>
+                            </CollapsibleSection>
+
+                            {/* VALUES */}
+                            <CollapsibleSection
+                                title="Valores Fundamentais"
+                                subtitle="Liste os valores que definem a organização."
+                                isVisible={settings.about_layout?.show_values}
+                                onVisibilityChange={(checked) => updateAbout('show_values', checked)}
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <Input
+                                        placeholder="Título da Seção de Valores"
+                                        value={settings.about_layout?.values_title || ''}
+                                        onChange={(e) => updateAbout('values_title', e.target.value)}
+                                        className="font-semibold"
+                                    />
+                                    <Input
+                                        placeholder="Subtítulo"
+                                        value={settings.about_layout?.values_subtitle || ''}
+                                        onChange={(e) => updateAbout('values_subtitle', e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                                        <Star className="w-4 h-4" /> Lista de Valores
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-4">
+                                        {settings.about_layout?.values_list?.map((val: any, idx: number) => (
+                                            <div key={idx} className="p-4 bg-white border rounded-xl shadow-sm relative group space-y-4 hover:shadow-md transition-shadow">
+                                                <div className="flex gap-6 items-start">
+                                                    <div className="w-1/4 space-y-2">
+                                                        <label className="text-xs font-semibold text-muted-foreground">Ícone</label>
+                                                        <IconPicker
+                                                            value={val.icon || 'Star'}
+                                                            onChange={(icon) => updateValueItem(idx, 'icon', icon)}
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 space-y-3">
+                                                        <Input
+                                                            placeholder="Título do Valor"
+                                                            value={val.title || ''}
+                                                            onChange={(e) => updateValueItem(idx, 'title', e.target.value)}
+                                                            className="font-medium"
+                                                        />
+                                                        <textarea
+                                                            placeholder="Descrição do valor..."
+                                                            value={val.description || ''}
+                                                            onChange={(e) => updateValueItem(idx, 'description', e.target.value)}
+                                                            className="flex w-full rounded-md border border-input bg-gray-50/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[60px]"
+                                                        />
+                                                    </div>
+                                                </div>
                                                 <button
                                                     onClick={() => {
-                                                        const newList = [...settings.about_layout.territories_list].filter((_, i) => i !== idx);
-                                                        updateAbout('territories_list', newList);
+                                                        const newList = [...settings.about_layout.values_list].filter((_, i) => i !== idx);
+                                                        updateAbout('values_list', newList);
                                                     }}
-                                                    className="absolute top-2 right-2 text-gray-300 hover:text-red-500 transition-colors"
+                                                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -1048,145 +1079,345 @@ export default function AdminSettingsPage() {
                                         ))}
                                     </div>
                                     <Button
-                                        onClick={() => updateAbout('territories_list', [...(settings.about_layout.territories_list || []), { region: '', description: '' }])}
-                                        variant="ghost"
-                                        className="w-full border border-dashed text-muted-foreground hover:text-primary hover:border-primary/50"
+                                        onClick={() => updateAbout('values_list', [...(settings.about_layout.values_list || []), { icon: 'Star', title: '', description: '' }])}
+                                        variant="outline"
+                                        className="w-full border-dashed py-6 hover:bg-gray-50 hover:border-primary/50 hover:text-primary transition-all"
                                     >
-                                        <Plus className="w-4 h-4 mr-2" /> Adicionar Território
+                                        <Plus className="w-4 h-4 mr-2" /> Adicionar Novo Valor
                                     </Button>
                                 </div>
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Imagem do Mapa</p>
-                                    <div className="bg-muted/10 rounded-xl p-2 border">
-                                        <ImageUploader
-                                            value={settings.about_layout?.territories_map_image || ''}
-                                            onChange={(url) => updateAbout('territories_map_image', url)}
-                                            bucket="site-assets"
-                                            height="h-full min-h-[300px]"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </CollapsibleSection>
+                            </CollapsibleSection>
 
-                        {/* TRANSPARENCY & DOCUMENTS */}
-                        <CollapsibleSection
-                            title="Transparência e Governança"
-                            subtitle="Documentos públicos e informações sobre a equipe."
-                            isVisible={settings.about_layout?.show_transparency}
-                            onVisibilityChange={(checked) => updateAbout('show_transparency', checked)}
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {/* TERRITORIES */}
+                            <CollapsibleSection
+                                title="Territórios"
+                                subtitle="Regiões onde a organização atua."
+                                isVisible={settings.about_layout?.show_territories}
+                                onVisibilityChange={(checked) => updateAbout('show_territories', checked)}
+                            >
                                 <Input
-                                    placeholder="Título (ex: Transparência)"
-                                    value={settings.about_layout?.transparency_title || ''}
-                                    onChange={(e) => updateAbout('transparency_title', e.target.value)}
+                                    placeholder="Título da Seção de Territórios"
+                                    value={settings.about_layout?.territories_title || ''}
+                                    onChange={(e) => updateAbout('territories_title', e.target.value)}
+                                    className="mb-6 font-semibold"
                                 />
-                                <Input
-                                    placeholder="Subtítulo"
-                                    value={settings.about_layout?.transparency_subtitle || ''}
-                                    onChange={(e) => updateAbout('transparency_subtitle', e.target.value)}
-                                />
-                            </div>
 
-                            <div className="space-y-6">
-                                <div className="space-y-3">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {settings.about_layout?.transparency_documents?.map((doc: any, idx: number) => (
-                                            <div key={idx} className="flex gap-3 items-center p-3 border rounded-xl bg-gray-50/50 group hover:bg-white hover:shadow-sm transition-all">
-                                                <div className="bg-red-50 p-2 rounded-lg text-red-500">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>
-                                                </div>
-                                                <div className="flex-1 space-y-1 min-w-0">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div className="space-y-4">
+                                        <div className="space-y-3">
+                                            {settings.about_layout?.territories_list?.map((terr: any, idx: number) => (
+                                                <div key={idx} className="p-4 bg-white border rounded-xl relative group space-y-2 hover:border-primary/30 transition-colors">
                                                     <Input
-                                                        placeholder="Nome do Documento"
-                                                        value={doc.name}
-                                                        onChange={(e) => {
-                                                            const newDocs = [...settings.about_layout.transparency_documents];
-                                                            newDocs[idx].name = e.target.value;
-                                                            updateAbout('transparency_documents', newDocs);
-                                                        }}
-                                                        className="text-sm h-7 p-0 border-0 bg-transparent focus-visible:ring-0 font-medium"
+                                                        placeholder="Região (ex: Bahia)"
+                                                        value={terr.region || ''}
+                                                        onChange={(e) => updateTerritoryItem(idx, 'region', e.target.value)}
+                                                        className="font-medium border-0 border-b rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary shadow-none"
                                                     />
-                                                    <a href={doc.url} target="_blank" className="text-xs text-muted-foreground truncate block hover:text-primary hover:underline">{doc.url}</a>
+                                                    <textarea
+                                                        placeholder="Descrição da atuação nesta região..."
+                                                        value={terr.description || ''}
+                                                        onChange={(e) => updateTerritoryItem(idx, 'description', e.target.value)}
+                                                        className="flex w-full rounded-md bg-transparent px-0 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-h-[40px] resize-none"
+                                                        rows={2}
+                                                    />
+                                                    <button
+                                                        onClick={() => {
+                                                            const newList = [...settings.about_layout.territories_list].filter((_, i) => i !== idx);
+                                                            updateAbout('territories_list', newList);
+                                                        }}
+                                                        className="absolute top-2 right-2 text-gray-300 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
                                                 </div>
-                                                <button onClick={() => removeDoc(idx)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all">
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
+                                        <Button
+                                            onClick={() => updateAbout('territories_list', [...(settings.about_layout.territories_list || []), { region: '', description: '' }])}
+                                            variant="ghost"
+                                            className="w-full border border-dashed text-muted-foreground hover:text-primary hover:border-primary/50"
+                                        >
+                                            <Plus className="w-4 h-4 mr-2" /> Adicionar Território
+                                        </Button>
                                     </div>
-                                    <div className="p-4 border border-dashed rounded-xl bg-gray-50/30 hover:bg-gray-50/80 transition-colors">
-                                        <p className="text-sm font-medium mb-3">Adicionar Novo Documento:</p>
-                                        <FileUploader
-                                            value=""
-                                            onChange={(url) => {
-                                                if (url) addDoc("Novo Documento", url);
-                                            }}
-                                            bucket="site-assets"
-                                            label="Clique para selecionar e enviar PDF"
+                                    <div className="space-y-2">
+                                        <p className="text-sm font-medium">Imagem do Mapa</p>
+                                        <div className="bg-muted/10 rounded-xl p-2 border">
+                                            <ImageUploader
+                                                value={settings.about_layout?.territories_map_image || ''}
+                                                onChange={(url) => updateAbout('territories_map_image', url)}
+                                                bucket="site-assets"
+                                                height="h-full min-h-[300px]"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </CollapsibleSection>
+
+                            {/* TRANSPARENCY & DOCUMENTS */}
+                            <CollapsibleSection
+                                title="Transparência e Governança"
+                                subtitle="Documentos públicos e informações sobre a equipe."
+                                isVisible={settings.about_layout?.show_transparency}
+                                onVisibilityChange={(checked) => updateAbout('show_transparency', checked)}
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <Input
+                                        placeholder="Título (ex: Transparência)"
+                                        value={settings.about_layout?.transparency_title || ''}
+                                        onChange={(e) => updateAbout('transparency_title', e.target.value)}
+                                    />
+                                    <Input
+                                        placeholder="Subtítulo"
+                                        value={settings.about_layout?.transparency_subtitle || ''}
+                                        onChange={(e) => updateAbout('transparency_subtitle', e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {settings.about_layout?.transparency_documents?.map((doc: any, idx: number) => (
+                                                <div key={idx} className="flex gap-3 items-center p-3 border rounded-xl bg-gray-50/50 group hover:bg-white hover:shadow-sm transition-all">
+                                                    <div className="bg-red-50 p-2 rounded-lg text-red-500">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                                    </div>
+                                                    <div className="flex-1 space-y-1 min-w-0">
+                                                        <Input
+                                                            placeholder="Nome do Documento"
+                                                            value={doc.name}
+                                                            onChange={(e) => {
+                                                                const newDocs = [...settings.about_layout.transparency_documents];
+                                                                newDocs[idx].name = e.target.value;
+                                                                updateAbout('transparency_documents', newDocs);
+                                                            }}
+                                                            className="text-sm h-7 p-0 border-0 bg-transparent focus-visible:ring-0 font-medium"
+                                                        />
+                                                        <a href={doc.url} target="_blank" className="text-xs text-muted-foreground truncate block hover:text-primary hover:underline">{doc.url}</a>
+                                                    </div>
+                                                    <button onClick={() => removeDoc(idx)} className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="p-4 border border-dashed rounded-xl bg-gray-50/30 hover:bg-gray-50/80 transition-colors">
+                                            <p className="text-sm font-medium mb-3">Adicionar Novo Documento:</p>
+                                            <FileUploader
+                                                value=""
+                                                onChange={(url) => {
+                                                    if (url) addDoc("Novo Documento", url);
+                                                }}
+                                                bucket="site-assets"
+                                                label="Clique para selecionar e enviar PDF"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2 pt-4 border-t">
+                                        <label className="text-sm font-medium">Texto Equipe/Governança</label>
+                                        <textarea
+                                            placeholder="Texto sobre a equipe..."
+                                            value={settings.about_layout?.team_text || ''}
+                                            onChange={(e) => updateAbout('team_text', e.target.value)}
+                                            className="flex w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            rows={4}
                                         />
                                     </div>
                                 </div>
+                            </CollapsibleSection>
 
-                                <div className="space-y-2 pt-4 border-t">
-                                    <label className="text-sm font-medium">Texto Equipe/Governança</label>
+                            {/* CTA */}
+                            <CollapsibleSection
+                                title="Chamada para Ação (Rodapé)"
+                                subtitle="Convite final para o usuário."
+                                isVisible={settings.about_layout?.show_cta}
+                                onVisibilityChange={(checked) => updateAbout('show_cta', checked)}
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Título</label>
+                                        <Input
+                                            placeholder="Título CTA"
+                                            value={settings.about_layout?.cta_title || ''}
+                                            onChange={(e) => updateAbout('cta_title', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Subtítulo</label>
+                                        <Input
+                                            placeholder="Subtítulo CTA"
+                                            value={settings.about_layout?.cta_subtitle || ''}
+                                            onChange={(e) => updateAbout('cta_subtitle', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Texto do Botão</label>
+                                        <Input
+                                            placeholder="Texto do Botão"
+                                            value={settings.about_layout?.cta_button_text || ''}
+                                            onChange={(e) => updateAbout('cta_button_text', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Link do Botão</label>
+                                        <Input
+                                            placeholder="Link do Botão"
+                                            value={settings.about_layout?.cta_button_url || ''}
+                                            onChange={(e) => updateAbout('cta_button_url', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </CollapsibleSection>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* FOOTER TAB */}
+                {activeTab === 'footer' && (
+                    <div className="space-y-6">
+                        {/* Newsletter Config */}
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-xl">Newsletter</CardTitle>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={settings.footer_layout.show_newsletter}
+                                        onChange={(e) => updateFooter('show_newsletter', e.target.checked)}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                </label>
+                            </CardHeader>
+                            <CardContent className="pt-6 space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Título</label>
+                                        <Input
+                                            value={settings.footer_layout.newsletter_title}
+                                            onChange={(e) => updateFooter('newsletter_title', e.target.value)}
+                                            placeholder="Ex: Fique por dentro"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Descrição</label>
+                                        <Input
+                                            value={settings.footer_layout.newsletter_text}
+                                            onChange={(e) => updateFooter('newsletter_text', e.target.value)}
+                                            placeholder="Ex: Receba novidades..."
+                                        />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Address Config */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Endereço e Localização</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Texto do Endereço</label>
                                     <textarea
-                                        placeholder="Texto sobre a equipe..."
-                                        value={settings.about_layout?.team_text || ''}
-                                        onChange={(e) => updateAbout('team_text', e.target.value)}
-                                        className="flex w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                        rows={4}
+                                        value={settings.footer_layout.address}
+                                        onChange={(e) => updateFooter('address', e.target.value)}
+                                        className="flex w-full rounded-md border border-input bg-white/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                        rows={3}
                                     />
                                 </div>
-                            </div>
-                        </CollapsibleSection>
+                            </CardContent>
+                        </Card>
 
-                        {/* CTA */}
-                        <CollapsibleSection
-                            title="Chamada para Ação (Rodapé)"
-                            subtitle="Convite final para o usuário."
-                            isVisible={settings.about_layout?.show_cta}
-                            onVisibilityChange={(checked) => updateAbout('show_cta', checked)}
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Link Columns Config */}
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <CardTitle>Colunas de Links</CardTitle>
+                                <Button onClick={addFooterColumn} size="sm" variant="outline">
+                                    <Plus className="w-4 h-4 mr-2" /> Nova Coluna
+                                </Button>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                {settings.footer_layout.columns.map((col: FooterColumn, colIndex: number) => (
+                                    <div key={colIndex} className="p-4 border rounded-xl bg-muted/20 relative group">
+                                        <button
+                                            onClick={() => removeFooterColumn(colIndex)}
+                                            className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-red-50 rounded-full"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+
+                                        <div className="mb-4">
+                                            <label className="text-sm font-medium block mb-1.5">Título da Coluna</label>
+                                            <Input
+                                                value={col.title}
+                                                onChange={(e) => updateFooterColumn(colIndex, 'title', e.target.value)}
+                                                className="font-medium"
+                                                placeholder="Ex: Institucional"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-3 pl-4 border-l-2 border-primary/20">
+                                            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Links</label>
+                                            {col.links.map((link, linkIndex) => (
+                                                <div key={linkIndex} className="flex gap-2 items-center">
+                                                    <Input
+                                                        value={link.text}
+                                                        onChange={(e) => updateFooterLink(colIndex, linkIndex, 'text', e.target.value)}
+                                                        placeholder="Texto"
+                                                        className="flex-1 h-9"
+                                                    />
+                                                    <Input
+                                                        value={link.url}
+                                                        onChange={(e) => updateFooterLink(colIndex, linkIndex, 'url', e.target.value)}
+                                                        placeholder="URL"
+                                                        className="flex-1 h-9"
+                                                    />
+                                                    <button
+                                                        onClick={() => removeFooterLink(colIndex, linkIndex)}
+                                                        className="text-muted-foreground hover:text-red-500 p-1"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <Button
+                                                onClick={() => addFooterLink(colIndex)}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-primary hover:text-primary/80 -ml-2"
+                                            >
+                                                <Plus className="w-3 h-3 mr-2" /> Adicionar Link
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {settings.footer_layout.columns.length === 0 && (
+                                    <p className="text-center text-muted-foreground py-8">Nenhuma coluna adicionada.</p>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        {/* Copyright */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Rodapé Inferior</CardTitle>
+                            </CardHeader>
+                            <CardContent>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Título</label>
+                                    <label className="text-sm font-medium">Texto de Copyright (substitui o padrão se preenchido)</label>
                                     <Input
-                                        placeholder="Título CTA"
-                                        value={settings.about_layout?.cta_title || ''}
-                                        onChange={(e) => updateAbout('cta_title', e.target.value)}
+                                        value={settings.footer_layout.copyright_text || ''}
+                                        onChange={(e) => updateFooter('copyright_text', e.target.value)}
+                                        placeholder="© 2024 Instituto Yary..."
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Subtítulo</label>
-                                    <Input
-                                        placeholder="Subtítulo CTA"
-                                        value={settings.about_layout?.cta_subtitle || ''}
-                                        onChange={(e) => updateAbout('cta_subtitle', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Texto do Botão</label>
-                                    <Input
-                                        placeholder="Texto do Botão"
-                                        value={settings.about_layout?.cta_button_text || ''}
-                                        onChange={(e) => updateAbout('cta_button_text', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Link do Botão</label>
-                                    <Input
-                                        placeholder="Link do Botão"
-                                        value={settings.about_layout?.cta_button_url || ''}
-                                        onChange={(e) => updateAbout('cta_button_url', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </CollapsibleSection>
+                            </CardContent>
+                        </Card>
                     </div>
                 )}
             </motion.div>
-        </div>
+        </div >
     )
 }
