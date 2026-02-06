@@ -27,34 +27,38 @@ export function Partners() {
                 )}
 
                 <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
-                    {home_layout.partners.map((partner, index) => (
-                        <motion.div
-                            key={partner.id || index}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="relative h-20 w-40 grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100"
-                        >
-                            {partner.url ? (
-                                <Link href={partner.url} target="_blank" rel="noopener noreferrer">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {home_layout.partners.map((partner, index) => {
+                        if (!partner.logo) return null
+
+                        return (
+                            <motion.div
+                                key={partner.id || index}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                                className="relative h-20 w-40 grayscale hover:grayscale-0 transition-all duration-300 opacity-70 hover:opacity-100"
+                            >
+                                {partner.url ? (
+                                    <Link href={partner.url} target="_blank" rel="noopener noreferrer">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={partner.logo}
+                                            alt={partner.name}
+                                            className="h-full w-full object-contain"
+                                        />
+                                    </Link>
+                                ) : (
+                                    // eslint-disable-next-line @next/next/no-img-element
                                     <img
                                         src={partner.logo}
                                         alt={partner.name}
                                         className="h-full w-full object-contain"
                                     />
-                                </Link>
-                            ) : (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={partner.logo}
-                                    alt={partner.name}
-                                    className="h-full w-full object-contain"
-                                />
-                            )}
-                        </motion.div>
-                    ))}
+                                )}
+                            </motion.div>
+                        )
+                    })}
                 </div>
             </div>
         </section>
