@@ -46,9 +46,6 @@ export function Header() {
                 </nav>
 
                 <div className="flex items-center gap-4">
-                    <Button variant="outline" size="sm" className="hidden sm:flex">
-                        Fazer Doação
-                    </Button>
                     <Button size="sm" onClick={() => setIsContactOpen(true)}>
                         Contato
                     </Button>
@@ -144,9 +141,6 @@ export function Header() {
                                     }}
                                 >
                                     Contato
-                                </Button>
-                                <Button variant="outline" className="w-full">
-                                    Fazer Doação
                                 </Button>
                             </div>
                         </div>
