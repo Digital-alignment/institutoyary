@@ -74,43 +74,39 @@ export default function Home() {
           </section>
         )}
 
-        {/* 3. New Section: Quote / Nossa Missão */}
+        {/* 3. Quote Section */}
         {home_layout.show_quote && (
-          <section className="bg-[#941c1d] py-24 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10 bg-[url('/pattern.png')] bg-repeat" /> {/* Optional Pattern */}
+          <section className="bg-[#941c1d] py-16 relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 bg-[url('/pattern.png')] bg-repeat" />
             <div className="container mx-auto px-4 md:px-8 relative z-10 text-center">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
                 {home_layout.quote_title && (
-                  <h3 className="text-white/80 uppercase tracking-widest font-bold mb-6 text-sm md:text-base">
+                  <h3 className="text-white/80 uppercase tracking-widest font-bold mb-4 text-xs md:text-sm">
                     {home_layout.quote_title}
                   </h3>
                 )}
-                <blockquote className="text-2xl md:text-4xl lg:text-5xl font-serif text-white leading-relaxed italic max-w-5xl mx-auto">
-                  "{home_layout.quote_text || "Acreditamos que a terra não nos pertence, nós pertencemos à terra."}"
+                <blockquote className="text-xl md:text-3xl lg:text-4xl font-serif text-white leading-relaxed italic max-w-4xl mx-auto mb-10">
+                  "{home_layout.quote_text || "Acreditamos que a terra não nos pertenece, nós pertencemos à terra."}"
                 </blockquote>
+
+                <div className="pt-2">
+                  <Link href="/projetos">
+                    <Button size="lg" className="rounded-full bg-white text-[#941c1d] px-8 py-6 text-lg font-bold hover:bg-gray-100 transition-all hover:scale-105">
+                      Explorar Todos os Projetos
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                </div>
               </motion.div>
             </div>
           </section>
         )}
 
-        {/* 4. Carrossel de Projetos (Featured) */}
-        <section className="bg-gray-50 border-y border-gray-100">
-          <ProjectsCarousel />
-          <div className="container mx-auto px-4 md:px-8 pb-12 text-center">
-            <Link href="/projetos">
-              <Button size="lg" className="rounded-full bg-[#941c1d] px-8 py-6 text-lg font-bold hover:bg-[#7a1617] shadow-lg shadow-[#941c1d]/20 transition-all hover:scale-105">
-                Explorar Todos os Projetos
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </section>
 
         {/* 5. Blogs (Saberes) */}
         {home_layout.show_blog && (
@@ -120,9 +116,8 @@ export default function Home() {
         {/* 6. Partners Section */}
         <Partners />
 
-        {/* 6. Manifesto (Values) - Keeping as optional or bottom section */}
-        {/* If user didn't ask to remove it, we keep it as 'extra' or remove if conflicts. User said 'Next section blog saberes', implying end. But Manifesto is good content. I'll leave it at the end. */}
-        <Manifesto />
+        {/* 6. Manifesto (Values) - Hidden for now */}
+        {/* <Manifesto /> */}
 
       </main>
 
