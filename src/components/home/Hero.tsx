@@ -58,8 +58,8 @@ export function Hero({ title, subtitle, text, slides, button1, button2 }: HeroPr
                 </div>
             </div>
 
-            {/* Content Content - Centered */}
-            <div className="relative z-10 flex h-full items-center justify-center p-4">
+            {/* Content - Centered */}
+            <div className="relative z-10 flex h-full items-center justify-center p-4 pb-20">
                 <div className="container mx-auto px-4 md:px-8 text-center text-white">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -107,16 +107,6 @@ export function Hero({ title, subtitle, text, slides, button1, button2 }: HeroPr
                 </div>
             </div>
 
-            {/* Scroll Indicator */}
-            <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/80"
-            >
-                <div className="h-12 w-8 rounded-full border-2 border-white/50 p-1 flex justify-center">
-                    <div className="h-3 w-1.5 rounded-full bg-white animate-scroll" />
-                </div>
-            </motion.div>
         </section>
     )
 }
