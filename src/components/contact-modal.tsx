@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Instagram, Facebook, Youtube, Mail } from "lucide-react";
+import { X, Instagram, Youtube, Mail } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 interface ContactModalProps {
     isOpen: boolean;
@@ -16,6 +17,8 @@ interface ContactModalProps {
 export function ContactModal({ isOpen, onClose }: ContactModalProps) {
     const [email, setEmail] = useState("");
     const [mounted, setMounted] = useState(false);
+    const { settings } = useSiteSettings();
+    const social = settings.social_links;
 
     useEffect(() => {
         setMounted(true);
@@ -74,30 +77,37 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
                                 {/* Social Links */}
                                 <div className="flex gap-4">
-                                    <Link
-                                        href="mailto:contato@institutoyary.org"
-                                        className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300"
+                                    <a
+                                        href={`mailto:${social.email || 'contato@institutoyary.org'}`}
+                                        className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
+                                        title="Email"
                                     >
-                                        <Mail className="w-5 h-5" />
-                                    </Link>
-                                    <Link
-                                        href="#"
-                                        className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300"
-                                    >
-                                        <Instagram className="w-5 h-5" />
-                                    </Link>
-                                    <Link
-                                        href="#"
-                                        className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300"
-                                    >
-                                        <Facebook className="w-5 h-5" />
-                                    </Link>
-                                    <Link
-                                        href="#"
-                                        className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300"
-                                    >
-                                        <Youtube className="w-5 h-5" />
-                                    </Link>
+                                        <Mail className="w-6 h-6" />
+                                    </a>
+                                    
+                                    {social.instagram && (
+                                        <a
+                                            href={social.instagram}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
+                                            title="Instagram"
+                                        >
+                                            <Instagram className="w-6 h-6" />
+                                        </a>
+                                    )}
+
+                                    {social.youtube && (
+                                        <a
+                                            href={social.youtube}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
+                                            title="YouTube"
+                                        >
+                                            <Youtube className="w-6 h-6" />
+                                        </a>
+                                    )}
                                 </div>
 
                                 {/* Divider */}
