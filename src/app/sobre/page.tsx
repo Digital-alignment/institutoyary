@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Sprout, Users, Heart, Globe, MapPin, FileText, ArrowRight, Loader2, Star, CheckCircle } from 'lucide-react'
+import { Sprout, Users, Heart, Globe, MapPin, FileText, ArrowRight, Loader2, Star, CheckCircle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
@@ -235,22 +235,27 @@ export default function AboutPage() {
                                         Documentação Oficial
                                     </h3>
                                     {transparencyDocs.length > 0 ? (
-                                        <ul className="space-y-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {transparencyDocs.map((doc, idx) => (
-                                                <li key={idx}>
-                                                    <Link href={doc.url} target="_blank" passHref>
-                                                        <Button variant="outline" className="w-full justify-start text-gray-600 hover:text-[#941c1d] hover:border-[#941c1d]">
-                                                            {doc.name}
-                                                        </Button>
-                                                    </Link>
-                                                </li>
+                                                <Link key={idx} href={doc.url} target="_blank" passHref className="group">
+                                                    <div className="flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-[#941c1d]/30 hover:shadow-md transition-all">
+                                                        <div className="flex items-center gap-3 overflow-hidden">
+                                                            <div className="bg-red-50 p-2.5 rounded-lg text-[#941c1d] group-hover:scale-110 transition-transform">
+                                                                <FileText className="w-5 h-5" />
+                                                            </div>
+                                                            <div className="truncate">
+                                                                <p className="font-semibold text-gray-900 truncate group-hover:text-[#941c1d] transition-colors">{doc.name}</p>
+                                                                <p className="text-xs text-gray-500 mt-0.5">Clique para visualizar</p>
+                                                            </div>
+                                                        </div>
+                                                        <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#941c1d] flex-shrink-0 ml-2" />
+                                                    </div>
+                                                </Link>
                                             ))}
-                                        </ul>
+                                        </div>
                                     ) : (
                                         <p className="text-muted-foreground text-sm italic">Nenhum documento disponível no momento.</p>
                                     )}
-                                </motion.div>
-
                                 </motion.div>
                             </div>
                         </div>
