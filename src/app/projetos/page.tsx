@@ -39,19 +39,41 @@ export default async function ProjetosPage() {
 
             {/* Projects List Section */}
             <main className="flex-1 container mx-auto px-4 pb-20">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {projects?.map((project) => (
-                        <div key={project.id} className="h-full">
-                            <ProjectCard project={project} />
-                        </div>
-                    ))}
-                    {(!projects || projects.length === 0) && (
-                        <div className="col-span-full text-center py-20 text-gray-500 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                            <p className="text-xl">Nenhum projeto publicado no momento.</p>
-                            <p className="text-sm mt-2">Volte em breve para ver nossas novidades.</p>
-                        </div>
-                    )}
-                </div>
+                {(!projects || projects.length === 0) ? (
+                    <div className="text-center py-20 text-gray-500 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                        <p className="text-xl">Nenhum projeto publicado no momento.</p>
+                        <p className="text-sm mt-2">Volte em breve para ver nossas novidades.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-16">
+                        {['Em execução', 'Buscando apoiadores', 'Concluído'].map((status) => {
+                            const group = projects.filter(p => p.project_status === status);
+
+                            return (
+                                <div key={status} className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
+                                        <div className="w-3 h-8 bg-[#941c1d] rounded-full"></div>
+                                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{status}</h2>
+                                    </div>
+                                    
+                                    {group.length > 0 ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {group.map((project) => (
+                                                <div key={project.id} className="h-full">
+                                                    <ProjectCard project={project} compact />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="py-12 text-center text-gray-500 bg-gray-50 rounded-2xl border border-gray-100 border-dashed">
+                                            <p className="font-medium">Nenhum projeto nesta fase no momento.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </main>
 
             {/* Engagement & Collaboration CTA */}

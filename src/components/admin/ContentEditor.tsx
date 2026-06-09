@@ -35,7 +35,7 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
 
     // Project specific fields
     const [isFeatured, setIsFeatured] = useState<boolean>(initialData?.is_featured || false)
-    const [projectStatus, setProjectStatus] = useState<string>(initialData?.project_status || 'Em Processo')
+    const [projectStatus, setProjectStatus] = useState<string>(initialData?.project_status || 'Em execução')
     const [progress, setProgress] = useState<number>(initialData?.progress || 0)
     const [links, setLinks] = useState<ProjectLink[]>(Array.isArray(initialData?.links) ? initialData.links : [])
 
@@ -267,9 +267,9 @@ export function ContentEditor({ type, initialData }: ContentEditorProps) {
                                         onChange={(e) => setProjectStatus(e.target.value)}
                                         className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#941c1d] focus:ring-[#941c1d] text-sm"
                                     >
-                                        <option value="Em Processo">Em Processo</option>
-                                        <option value="Publicado">Publicado</option>
-                                        <option value="Terminado">Terminado</option>
+                                        <option value="Em execução">Em execução</option>
+                                        <option value="Buscando apoiadores">Buscando apoiadores</option>
+                                        <option value="Concluído">Concluído</option>
                                     </select>
                                 </div>
 

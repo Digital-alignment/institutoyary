@@ -19,15 +19,19 @@ interface Project {
 
 interface ProjectCardProps {
     project: Project
+    compact?: boolean
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, compact = false }: ProjectCardProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     // Status Badge Colors
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Apresentado': return 'bg-purple-100 text-purple-800'
+            case 'Buscando apoiadores': return 'bg-purple-100 text-purple-800'
+            case 'Concluído': return 'bg-green-100 text-green-800'
+            case 'Em execução': return 'bg-yellow-100 text-yellow-800'
+            // Fallbacks for unmigrated data just in case
             case 'Publicado': return 'bg-green-100 text-green-800'
             case 'Terminado': return 'bg-blue-100 text-blue-800'
             case 'Em Processo': return 'bg-yellow-100 text-yellow-800'
@@ -49,7 +53,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <motion.div
                 layoutId={`card-${project.id}`}
                 onClick={() => setIsOpen(true)}
-                className="group relative h-[450px] md:h-[550px] w-full cursor-pointer overflow-hidden rounded-2xl bg-white shadow-xl transition-all hover:shadow-2xl"
+                className={`group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-white shadow-xl transition-all hover:shadow-2xl ${compact ? 'h-[350px] md:h-[400px]' : 'h-[450px] md:h-[550px]'}`}
                 whileHover={{ y: -5 }}
             >
                 {/* Image Background */}
