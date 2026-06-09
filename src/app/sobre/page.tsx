@@ -223,7 +223,7 @@ export default function AboutPage() {
 
                 {/* Seção 6: Transparência e Governança */}
                 {about_layout?.show_transparency && (
-                    <section className="py-24 bg-gray-50 border-t border-gray-100">
+                    <section className="py-12 lg:py-16 bg-[#f8f2d8] border-t border-[#f8f2d8]/90">
                         <div className="container mx-auto px-4 md:px-8">
                             <div className="text-center mb-16">
                                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{about_layout?.transparency_title}</h2>
