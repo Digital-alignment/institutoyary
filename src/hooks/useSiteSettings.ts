@@ -55,6 +55,7 @@ export interface SiteSettings {
         featured_blogs?: string[] // IDs of blogs to show
 
         // Manifesto Section
+        show_manifesto: boolean
         manifesto_title?: string
         manifesto_text?: string
 
@@ -159,6 +160,7 @@ const defaultSettings: SiteSettings = {
         featured_blogs: [],
 
         // Manifesto Section
+        show_manifesto: true,
         manifesto_title: 'Manifesto',
         manifesto_text: '', // Will default to hardcoded if empty
 
