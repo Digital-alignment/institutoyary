@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { Sprout, Users, Heart, Globe, MapPin, FileText, ArrowRight, Loader2, Star, CheckCircle, ExternalLink } from 'lucide-react'
+import { Sprout, Users, Heart, Globe, MapPin, FileText, ArrowRight, Loader2, Star, CheckCircle, ExternalLink, Leaf, Sun, Award, Zap, Shield, Target } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSiteSettings } from '@/hooks/useSiteSettings'
@@ -18,6 +18,12 @@ const IconMap: Record<string, React.ReactNode> = {
     'Heart': <Heart className="h-10 w-10 text-[#941c1d]" />,
     'Star': <Star className="h-10 w-10 text-[#941c1d]" />,
     'Check': <CheckCircle className="h-10 w-10 text-[#941c1d]" />,
+    'Leaf': <Leaf className="h-10 w-10 text-[#941c1d]" />,
+    'Sun': <Sun className="h-10 w-10 text-[#941c1d]" />,
+    'Award': <Award className="h-10 w-10 text-[#941c1d]" />,
+    'Zap': <Zap className="h-10 w-10 text-[#941c1d]" />,
+    'Shield': <Shield className="h-10 w-10 text-[#941c1d]" />,
+    'Target': <Target className="h-10 w-10 text-[#941c1d]" />,
 }
 
 export default function AboutPage() {
