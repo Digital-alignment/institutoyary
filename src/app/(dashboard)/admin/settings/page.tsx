@@ -123,6 +123,10 @@ export default function AdminSettingsPage() {
             show_transparency: true,
             transparency_title: '', transparency_subtitle: '', transparency_documents: [], team_text: '',
 
+            // Team / Governance
+            show_team: true,
+            team_title: '', team_subtitle: '', team_members: [],
+
             // CTA
             show_cta: true,
             cta_title: '', cta_subtitle: '', cta_button_text: '', cta_button_url: ''
@@ -178,7 +182,8 @@ export default function AdminSettingsPage() {
                         ...data.about_layout,
                         values_list: data.about_layout?.values_list || [],
                         territories_list: data.about_layout?.territories_list || [],
-                        transparency_documents: data.about_layout?.transparency_documents || []
+                        transparency_documents: data.about_layout?.transparency_documents || [],
+                        team_members: data.about_layout?.team_members || []
                     },
                     footer_layout: {
                         ...settings.footer_layout,
@@ -298,6 +303,23 @@ export default function AdminSettingsPage() {
     const removeDoc = (index: number) => {
         const newDocs = [...(settings.about_layout.transparency_documents || [])].filter((_, i) => i !== index);
         updateAbout('transparency_documents', newDocs);
+    }
+
+    const updateTeamMember = (index: number, field: string, value: string) => {
+        const newMembers = [...(settings.about_layout.team_members || [])];
+        if (!newMembers[index]) return;
+        newMembers[index] = { ...newMembers[index], [field]: value };
+        updateAbout('team_members', newMembers);
+    }
+
+    const addTeamMember = () => {
+        const newMembers = [...(settings.about_layout.team_members || []), { id: crypto.randomUUID(), name: '', role: '', description: '', image: '' }];
+        updateAbout('team_members', newMembers);
+    }
+
+    const removeTeamMember = (index: number) => {
+        const newMembers = [...(settings.about_layout.team_members || [])].filter((_, i) => i !== index);
+        updateAbout('team_members', newMembers);
     }
 
     // Footer Helpers
@@ -1224,16 +1246,83 @@ export default function AdminSettingsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2 pt-4 border-t">
-                                        <label className="text-sm font-medium">Texto Equipe/Governança</label>
-                                        <textarea
-                                            placeholder="Texto sobre a equipe..."
-                                            value={settings.about_layout?.team_text || ''}
-                                            onChange={(e) => updateAbout('team_text', e.target.value)}
-                                            className="flex w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                            rows={4}
-                                        />
-                                    </div>
+                                </div>
+                            </CollapsibleSection>
+
+                            {/* TEAM & GOVERNANCE */}
+                            <CollapsibleSection
+                                title="Equipe e Governança"
+                                subtitle="Membros da diretoria, conselho e equipe."
+                                isVisible={settings.about_layout?.show_team}
+                                onVisibilityChange={(checked) => updateAbout('show_team', checked)}
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <Input
+                                        placeholder="Título (ex: Nossa Equipe)"
+                                        value={settings.about_layout?.team_title || ''}
+                                        onChange={(e) => updateAbout('team_title', e.target.value)}
+                                    />
+                                    <Input
+                                        placeholder="Subtítulo"
+                                        value={settings.about_layout?.team_subtitle || ''}
+                                        onChange={(e) => updateAbout('team_subtitle', e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="space-y-4">
+                                    {settings.about_layout?.team_members?.map((member: any, idx: number) => (
+                                        <div key={member.id || idx} className="p-4 border rounded-xl bg-gray-50/50 relative group">
+                                            <button
+                                                onClick={() => removeTeamMember(idx)}
+                                                className="absolute top-2 right-2 text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                            
+                                            <div className="flex flex-col md:flex-row gap-6 items-start">
+                                                <div className="w-32 flex-shrink-0 space-y-2">
+                                                    <div className="bg-white rounded-lg p-1 border">
+                                                        <ImageUploader
+                                                            value={member.image || ''}
+                                                            onChange={(url) => updateTeamMember(idx, 'image', url)}
+                                                            bucket="site-assets"
+                                                            height="h-32"
+                                                        />
+                                                    </div>
+                                                    <p className="text-[10px] text-center text-muted-foreground">Foto (Ex: 300x300)</p>
+                                                </div>
+                                                <div className="flex-1 space-y-3 w-full">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <Input
+                                                            placeholder="Nome do Membro"
+                                                            value={member.name || ''}
+                                                            onChange={(e) => updateTeamMember(idx, 'name', e.target.value)}
+                                                            className="font-medium"
+                                                        />
+                                                        <Input
+                                                            placeholder="Cargo / Posição (Ex: Diretor)"
+                                                            value={member.role || ''}
+                                                            onChange={(e) => updateTeamMember(idx, 'role', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <textarea
+                                                        placeholder="Breve descrição ou biografia..."
+                                                        value={member.description || ''}
+                                                        onChange={(e) => updateTeamMember(idx, 'description', e.target.value)}
+                                                        className="flex w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                                                        rows={2}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <Button
+                                        onClick={addTeamMember}
+                                        variant="outline"
+                                        className="w-full border-dashed py-6 hover:bg-gray-50 hover:border-primary/50 hover:text-primary transition-all"
+                                    >
+                                        <Plus className="w-4 h-4 mr-2" /> Adicionar Membro da Equipe
+                                    </Button>
                                 </div>
                             </CollapsibleSection>
 

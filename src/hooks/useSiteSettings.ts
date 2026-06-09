@@ -115,6 +115,12 @@ export interface SiteSettings {
         transparency_documents: { name: string, url: string }[]
         team_text: string
 
+        // Team / Governance
+        show_team: boolean
+        team_title: string
+        team_subtitle: string
+        team_members: { id: string, name: string, role: string, description: string, image: string }[]
+
         // CTA
         show_cta: boolean
         cta_title: string
@@ -220,10 +226,15 @@ const defaultSettings: SiteSettings = {
         territories_map_image: '',
 
         show_transparency: true,
-        transparency_title: 'Transparência e Governança',
+        transparency_title: 'Transparência',
         transparency_subtitle: 'Compromisso com a verdade e a responsabilidade',
         transparency_documents: [],
         team_text: 'Conheça a diretoria e o conselho que guiam nossas ações, incluindo lideranças Guarani fundamentais para nossa governança.',
+
+        show_team: true,
+        team_title: 'Nossa Equipe e Governança',
+        team_subtitle: 'Conheça a diretoria e o conselho que guiam nossas ações.',
+        team_members: [],
 
         show_cta: true,
         cta_title: 'Quer co-criar esse futuro conosco?',

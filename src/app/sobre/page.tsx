@@ -227,7 +227,7 @@ export default function AboutPage() {
                                 <p className="mt-4 text-lg text-gray-600">{about_layout?.transparency_subtitle}</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                            <div className="max-w-2xl mx-auto">
                                 {/* Documentos */}
                                 <motion.div {...fadeInUp} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                                     <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -251,28 +251,57 @@ export default function AboutPage() {
                                     )}
                                 </motion.div>
 
-                                {/* Equipe / Liderança */}
-                                <motion.div {...fadeInUp} transition={{ delay: 0.2 }} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                        <Users className="h-6 w-6 text-[#941c1d]" />
-                                        Nossa Equipe
-                                    </h3>
-                                    <p className="text-gray-600 mb-6 whitespace-pre-wrap">
-                                        {about_layout?.team_text}
-                                    </p>
-                                    <div className="flex gap-[-10px]">
-                                        {/* Avatars placeholder - kept static for now as requested */}
-                                        {[1, 2, 3, 4].map(n => (
-                                            <div key={n} className="w-12 h-12 rounded-full bg-gray-200 border-2 border-white -ml-3 first:ml-0 flex items-center justify-center text-xs font-bold text-gray-500">
-                                                Foto
-                                            </div>
-                                        ))}
-                                        <div className="w-12 h-12 rounded-full bg-[#f8f2d8] border-2 border-white -ml-3 flex items-center justify-center text-xs text-[#941c1d] font-bold">
-                                            +10
-                                        </div>
-                                    </div>
                                 </motion.div>
                             </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Seção Nova: Nossa Equipe */}
+                {about_layout?.show_team && (
+                    <section className="py-24 bg-white border-t border-gray-100">
+                        <div className="container mx-auto px-4 md:px-8">
+                            <div className="text-center mb-16">
+                                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{about_layout?.team_title || 'Nossa Equipe e Governança'}</h2>
+                                <p className="mt-4 text-lg text-gray-600">{about_layout?.team_subtitle}</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                                {about_layout?.team_members?.map((member, idx) => (
+                                    <motion.div
+                                        key={member.id || idx}
+                                        {...fadeInUp}
+                                        transition={{ delay: idx * 0.1 }}
+                                        className="group bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all border border-gray-100 flex flex-col items-center text-center space-y-4"
+                                    >
+                                        <div className="w-32 h-32 relative rounded-full overflow-hidden mb-2 ring-4 ring-gray-50 group-hover:ring-[#f8f2d8] transition-all">
+                                            {member.image ? (
+                                                <Image
+                                                    src={member.image}
+                                                    alt={member.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                                                    <Users className="w-10 h-10" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900 leading-tight">{member.name}</h3>
+                                            <p className="text-sm font-semibold text-[#941c1d] mt-1">{member.role}</p>
+                                        </div>
+                                        <p className="text-sm text-gray-600 leading-relaxed">
+                                            {member.description}
+                                        </p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                            
+                            {(!about_layout?.team_members || about_layout.team_members.length === 0) && (
+                                <p className="text-center text-gray-500 italic">Nenhum membro cadastrado ainda.</p>
+                            )}
                         </div>
                     </section>
                 )}
