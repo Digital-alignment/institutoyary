@@ -8,6 +8,7 @@ import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { ArrowLeft, Globe, Instagram, Facebook, Music, Video, Link as LinkIcon } from 'lucide-react'
 import { ShareProject } from '@/components/projects/ShareProject'
+import { ProjectContactCTA } from '@/components/projects/ProjectContactCTA'
 
 export const revalidate = 60
 
@@ -137,20 +138,7 @@ export default async function ProjetoPage({ params }: Props) {
                 </article>
 
                 {/* Join Call to Action */}
-                <section className="bg-gray-50 py-20 border-t">
-                    <div className="container mx-auto px-4 text-center max-w-2xl space-y-6">
-                        <h2 className="text-3xl font-bold text-[#941c1d]">Gostou deste projeto?</h2>
-                        <p className="text-gray-600 text-lg">
-                            Entre em contato conosco para saber como você pode apoiar ou participar desta iniciativa.
-                        </p>
-                        <Link
-                            href="/contato"
-                            className="inline-block bg-[#941c1d] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#7a1617] transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                        >
-                            Entrar em Contato
-                        </Link>
-                    </div>
-                </section>
+                <ProjectContactCTA />
             </main>
 
             <Footer />

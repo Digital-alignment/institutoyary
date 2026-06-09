@@ -47,7 +47,7 @@ export default async function ProjetosPage() {
                 ) : (
                     <div className="space-y-16">
                         {['Em execução', 'Buscando apoiadores', 'Concluído'].map((status) => {
-                            const group = projects.filter(p => p.project_status === status);
+                            const group = projects.filter(p => p.project_status === status || (status === 'Em execução' && p.project_status === 'Em Processo'));
 
                             return (
                                 <div key={status} className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
