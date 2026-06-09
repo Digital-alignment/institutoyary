@@ -89,6 +89,7 @@ export default function AdminSettingsPage() {
             show_blog: true,
             featured_blogs: [],
             // New Fields
+            show_manifesto: true,
             manifesto_title: '',
             manifesto_text: '',
             show_partners: true,
@@ -752,8 +753,17 @@ export default function AdminSettingsPage() {
 
                         {/* MANIFESTO SECTION */}
                         <Card>
-                            <CardHeader>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-xl">Seção Manifesto</CardTitle>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={settings.home_layout.show_manifesto}
+                                        onChange={(e) => updateHome('show_manifesto', e.target.checked)}
+                                        className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                </label>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <Input

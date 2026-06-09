@@ -116,8 +116,10 @@ export default function Home() {
         {/* 6. Partners Section */}
         <Partners />
 
-        {/* 6. Manifesto (Values) - Hidden for now */}
-        {/* <Manifesto /> */}
+        {/* 6. Manifesto (Values) */}
+        {home_layout.show_manifesto && (
+          <Manifesto />
+        )}
 
       </main>
 
