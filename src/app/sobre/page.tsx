@@ -177,10 +177,10 @@ export default function AboutPage() {
 
                 {/* Seção 5: Territórios de Atuação */}
                 {about_layout?.show_territories && (
-                    <section className="py-24 bg-white">
+                    <section className="py-6 lg:py-10 bg-white">
                         <div className="container mx-auto px-4 md:px-8">
-                            <div className="flex flex-col lg:flex-row gap-16 items-center">
-                                <div className="lg:w-1/2">
+                            <div className="flex flex-col lg:flex-row gap-12 items-center">
+                                <div className="lg:w-5/12">
                                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">{about_layout?.territories_title}</h2>
                                     <div className="space-y-8">
                                         {territoriesList.map((t, i) => (
@@ -201,16 +201,19 @@ export default function AboutPage() {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="lg:w-1/2 h-[400px] bg-gray-100 rounded-3xl flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden relative">
+                                <div className="lg:w-7/12 w-full h-[400px] lg:h-[600px] bg-gray-50/50 rounded-[2rem] flex items-center justify-center overflow-hidden relative shadow-2xl shadow-gray-200/50">
                                     {about_layout?.territories_map_image ? (
                                         <Image
                                             src={about_layout.territories_map_image}
                                             alt="Mapa"
                                             fill
-                                            className="object-cover"
+                                            className="object-cover rounded-[2rem]"
+                                            quality={100}
                                         />
                                     ) : (
-                                        <span className="text-gray-400 font-medium">[Mapa Estilizado dos Territórios]</span>
+                                        <div className="border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center rounded-[2rem]">
+                                            <span className="text-gray-400 font-medium">[Mapa Estilizado dos Territórios]</span>
+                                        </div>
                                     )}
                                 </div>
                             </div>
